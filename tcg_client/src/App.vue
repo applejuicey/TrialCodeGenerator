@@ -36,8 +36,15 @@ export default {
   data () {
     return {
       locale: enGB,
-      menuSelectedKeys: ['2'],
     };
+  },
+  computed: {
+    menuSelectedKeys: function () {
+      const menuKeysRouterNameMap = new Map();
+      menuKeysRouterNameMap.set( 'code-list', ['1'])
+      .set('code-gen', ['2']);
+      return menuKeysRouterNameMap.get(this.$route.name);
+    },
   },
   methods: {
     pushRoute: function (routeName) {

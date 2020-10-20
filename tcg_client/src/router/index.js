@@ -2,6 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   {
+    path: '/',
+    redirect: '/generator',
+  },
+  {
     path: '/generator',
     name: 'code-gen',
     component: () => import('../views/Generator.vue')
