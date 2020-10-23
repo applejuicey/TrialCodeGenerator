@@ -91,13 +91,17 @@ export default {
     generateTrialCode: function () {
       console.log('submit!', this.codeGeneratorForm);
       this.waiting = true;
-      setTimeout(() => {
+
+      this.$axios.post('/generate', this.codeGeneratorForm).then((response) => {
+        console.log(response);
         this.waiting = false;
         this.submitted = true;
-      }, 3000);
-      this.submissionResult.status = 'success';
-      this.submissionResult.title = 'Action Success';
-      this.submissionResult.subTitle = 'Your submission is successful and the unique trial code is XXX.';
+        this.submissionResult.status = 'success';
+        this.submissionResult.title = 'Action Success';
+        this.submissionResult.subTitle = 'Your submission is successful and the unique trial code is XXX.';
+      }).catch((error) => {
+        console.log(error);
+      });
     },
     pushRoute: function (routeName) {
       this.$router.push({
