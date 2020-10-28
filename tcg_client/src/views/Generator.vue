@@ -89,18 +89,29 @@ export default {
   },
   methods: {
     generateTrialCode: function () {
-      console.log('submit!', this.codeGeneratorForm);
       this.waiting = true;
-
-      this.$axios.post('/generate', this.codeGeneratorForm).then((response) => {
+      this.$axios.post(
+          '/generate',
+          {
+            newTrial: this.codeGeneratorForm,
+          },
+      ).then((response) => {
         console.log(response);
         this.waiting = false;
         this.submitted = true;
         this.submissionResult.status = 'success';
-        this.submissionResult.title = 'Action Success';
-        this.submissionResult.subTitle = 'Your submission is successful and the unique trial code is XXX.';
+        this.submissionResult.title = 'Action Succeeded';
+        const createdTrial = response.data.createdTrial;
+        const trialCode = createdTrial.trialCompoundName + '-' + createdTrial.trialPhase + '-' +
+        createdTrial.uniqueSequenceCode + (createdTrial.countryCode? ('-' + createdTrial.countryCode) : '');
+        this.submissionResult.subTitle = `Your submission is successful and the unique trial code is ${ trialCode }.`;
       }).catch((error) => {
         console.log(error);
+        this.waiting = false;
+        this.submitted = true;
+        this.submissionResult.status = 'error';
+        this.submissionResult.title = 'Action Failed';
+        this.submissionResult.subTitle = `Your submission failed, detailed error is listed as follows: ${ error }.`;
       });
     },
     pushRoute: function (routeName) {

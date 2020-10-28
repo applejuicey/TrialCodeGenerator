@@ -37,6 +37,16 @@ Trial.init({
       },
     },
   },
+  uniqueSequenceCode: {
+    type: Sequelize.INTEGER(),
+    allowNull: false,
+    defaultValue: 1,
+    validate: {
+      notNull: {
+        msg: 'a unique trial sequence code should be specified'
+      },
+    },
+  },
   countryCode: {
     type: Sequelize.STRING(100),
     allowNull: true,
@@ -45,11 +55,7 @@ Trial.init({
     type: Sequelize.ENUM,
     values: ['c0', 'c1'],
     allowNull: false,
-    validate: {
-      notNull: {
-        msg: 'the confirmation status of the trial should be specified'
-      },
-    },
+    defaultValue: "c0",
   },
 }, {
   sequelize,
