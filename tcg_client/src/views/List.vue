@@ -51,11 +51,16 @@
           <span>{{ formatTrialPhase(text) }}</span>
         </template>
         <template v-slot:action="{ text, record }">
-          <a-button type="danger" size="small"
-                    @click="deleteRecord(text, record)">
-            <template v-slot:icon><delete-outlined/></template>
-            Delete
-          </a-button>
+          <a-button-group>
+            <a-button type="danger" size="small"
+                      @click="deleteRecord(text, record)">
+              <template v-slot:icon><delete-outlined/></template>
+            </a-button>
+            <a-button type="primary" size="small"
+                      @click="showTrialCode(text, record)">
+              <template v-slot:icon><star-outlined/></template>
+            </a-button>
+          </a-button-group>
         </template>
       </a-table>
     </a-col>
@@ -64,13 +69,20 @@
 </template>
 
 <script>
-import { SmileOutlined, SearchOutlined, DeleteOutlined } from '@ant-design/icons-vue';
+import {
+  SmileOutlined,
+  SearchOutlined,
+  DeleteOutlined,
+  StarOutlined,
+} from '@ant-design/icons-vue';
+import { h } from 'vue';
 export default {
   name: 'Home',
   components: {
     SmileOutlined,
     SearchOutlined,
     DeleteOutlined,
+    StarOutlined,
   },
   data() {
     return {
@@ -240,6 +252,18 @@ export default {
           message: 'Action Failed',
           description: `Sorry, your request failed. Detailed error description is listed as follows:${ error }`,
         });
+      });
+    },
+    showTrialCode: function (text, targetRecord) {
+      const trialCode = targetRecord.trialCompoundName + '-' + this.formatTrialPhase(targetRecord.trialPhase) + '-' +
+          targetRecord.trialPhase.substr(1, 1) + targetRecord.uniqueSequenceCode +
+          (targetRecord.countryCode? ('-' + targetRecord.countryCode) : '');
+      this.$success({
+        title: 'View Unique Trial Code',
+        content: h('div', {}, [
+          h('p', 'The unique trial code is:'),
+          h('code', `${ trialCode }`),
+        ]),
       });
     },
     formatConfirmationStatus: function (value) {

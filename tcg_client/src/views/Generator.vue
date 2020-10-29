@@ -88,6 +88,11 @@ export default {
     };
   },
   methods: {
+    formatTrialPhase: function (value) {
+      const phaseMap = new Map();
+      phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
+      return phaseMap.get(value);
+    },
     generateTrialCode: function () {
       this.waiting = true;
       this.$axios.post(
@@ -102,8 +107,9 @@ export default {
         this.submissionResult.status = 'success';
         this.submissionResult.title = 'Action Succeeded';
         const createdTrial = response.data.createdTrial;
-        const trialCode = createdTrial.trialCompoundName + '-' + createdTrial.trialPhase + '-' +
-        createdTrial.uniqueSequenceCode + (createdTrial.countryCode? ('-' + createdTrial.countryCode) : '');
+        const trialCode = createdTrial.trialCompoundName + '-' + this.formatTrialPhase(createdTrial.trialPhase) + '-' +
+            createdTrial.trialPhase.substr(1, 1) + createdTrial.uniqueSequenceCode +
+            (createdTrial.countryCode? ('-' + createdTrial.countryCode) : '');
         this.submissionResult.subTitle = `Your submission is successful and the unique trial code is ${ trialCode }.`;
       }).catch((error) => {
         console.log(error);

@@ -1,10 +1,93 @@
 const { Trial } = require('../models/index');
+const sequelize = require('../database/index');
+const { Op } = require("sequelize");
 
 // create one trial
 const createOneTrial = async function(newTrial) {
-  return Trial.create(
-    newTrial,
-  );
+  try {
+    return await sequelize.transaction(async (transaction) => {
+      const parsedNewTrial = {
+        trialCompoundName: newTrial.compoundCode,
+        trialPhase: newTrial.trialPhase,
+        trialGenerationYearMonth: newTrial.dateOfGeneration,
+        countryCode: newTrial.countryCode,
+      };
+      let currentMaxUniqueSequenceCode = await Trial.max(
+        'uniqueSequenceCode',
+        {
+          where: {
+            trialCompoundName: {
+              [Op.eq]: parsedNewTrial.trialCompoundName,
+            },
+          },
+        },
+      );
+      currentMaxUniqueSequenceCode = currentMaxUniqueSequenceCode? currentMaxUniqueSequenceCode : 0;
+      parsedNewTrial.uniqueSequenceCode = currentMaxUniqueSequenceCode + 1;
+      return await Trial.create(
+        parsedNewTrial,
+      );
+    });
+  } catch (error) {
+    console.error(error)
+  }
 };
 
-module.exports = { createOneTrial };
+// get specific trials
+const getSpecificTrials = async function(batchQueryParams) {
+  try {
+    // skip 'offset' instances and fetch the 'limit' after that
+    let queryFilters = {};
+    for (let filterKey in batchQueryParams.filters) {
+      queryFilters[filterKey] = batchQueryParams.filters[filterKey];
+    }
+    let queryResults = {};
+    queryResults.hitTargets = await Trial.findAll({
+      offset: batchQueryParams.results * (batchQueryParams.page - 1),
+      limit: batchQueryParams.results,
+      order: [
+        [batchQueryParams.sortField, batchQueryParams.sortOrder === 'descend'? 'DESC' : 'ASC'],
+      ],
+      where: queryFilters,
+    });
+    queryResults.totalCount = await Trial.count();
+    return queryResults;
+  } catch (error) {
+    console.error(error)
+  }
+};
+
+// update one trial
+const updateOneTrial = async function(newTrial) {
+  try {
+    return await sequelize.transaction(async (transaction) => {
+      const targetRecord = await Trial.findOne({
+        where: {
+          trialUUID: newTrial.trialUUID,
+        }
+      });
+      targetRecord.trialConfirmationStatus = newTrial.trialConfirmationStatus;
+      return await targetRecord.save();
+    });
+  } catch (error) {
+    console.error(error)
+  }
+};
+
+// delete one trial
+const deleteOneTrial = async function(trialUUID) {
+  try {
+    return await sequelize.transaction(async (transaction) => {
+      const targetRecord = await Trial.findOne({
+        where: {
+          trialUUID: trialUUID,
+        }
+      });
+      return await targetRecord.destroy();
+    });
+  } catch (error) {
+    console.error(error)
+  }
+};
+
+module.exports = { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial };
