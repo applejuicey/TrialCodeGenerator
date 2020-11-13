@@ -49,7 +49,7 @@ router.post('/api/batchQuery', async (ctx, next) => {
 router.patch('/api/update', async (ctx, next) => {
   let result;
   try {
-    const updatedTrial = await updateOneTrial(ctx.request.body.newTrial);
+    const updatedTrial = await updateOneTrial(ctx.request.body.updatedTrial);
     result = {
       statusCode: "1",
       updatedTrial: updatedTrial,

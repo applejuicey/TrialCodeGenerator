@@ -28,7 +28,7 @@ Trial.init({
       },
     },
   },
-  trialGenerationYearMonth: {
+  trialGenerationDate: {
     type: Sequelize.STRING(100),
     allowNull: false,
     validate: {
@@ -37,7 +37,7 @@ Trial.init({
       },
     },
   },
-  uniqueSequenceCode: {
+  trialUniqueSequenceCode: {
     type: Sequelize.INTEGER(),
     allowNull: false,
     defaultValue: 1,
@@ -47,15 +47,19 @@ Trial.init({
       },
     },
   },
-  countryCode: {
+  trialCountryCode: {
     type: Sequelize.STRING(100),
     allowNull: true,
   },
-  trialConfirmationStatus: {
+  trialStatus: {
     type: Sequelize.ENUM,
-    values: ['c0', 'c1'],
+    values: ['s0', 's1', 's2'],
     allowNull: false,
-    defaultValue: "c0",
+    defaultValue: "s0",
+  },
+  trialStatusDescription: {
+    type: Sequelize.STRING(255),
+    allowNull: true,
   },
 }, {
   sequelize,

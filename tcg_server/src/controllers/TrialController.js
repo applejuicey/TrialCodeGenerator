@@ -7,13 +7,13 @@ const createOneTrial = async function(newTrial) {
   try {
     return await sequelize.transaction(async (transaction) => {
       const parsedNewTrial = {
-        trialCompoundName: newTrial.compoundCode,
+        trialCompoundName: newTrial.trialCompoundName,
         trialPhase: newTrial.trialPhase,
-        trialGenerationYearMonth: newTrial.dateOfGeneration,
-        countryCode: newTrial.countryCode,
+        trialGenerationDate: newTrial.trialGenerationDate,
+        trialCountryCode: newTrial.trialCountryCode,
       };
       let currentMaxUniqueSequenceCode = await Trial.max(
-        'uniqueSequenceCode',
+        'trialUniqueSequenceCode',
         {
           where: {
             trialCompoundName: {
@@ -23,7 +23,7 @@ const createOneTrial = async function(newTrial) {
         },
       );
       currentMaxUniqueSequenceCode = currentMaxUniqueSequenceCode? currentMaxUniqueSequenceCode : 0;
-      parsedNewTrial.uniqueSequenceCode = currentMaxUniqueSequenceCode + 1;
+      parsedNewTrial.trialUniqueSequenceCode = currentMaxUniqueSequenceCode + 1;
       return await Trial.create(
         parsedNewTrial,
       );
@@ -58,15 +58,19 @@ const getSpecificTrials = async function(batchQueryParams) {
 };
 
 // update one trial
-const updateOneTrial = async function(newTrial) {
+const updateOneTrial = async function(updatedTrial) {
   try {
     return await sequelize.transaction(async (transaction) => {
       const targetRecord = await Trial.findOne({
         where: {
-          trialUUID: newTrial.trialUUID,
+          trialUUID: updatedTrial.trialUUID,
         }
       });
-      targetRecord.trialConfirmationStatus = newTrial.trialConfirmationStatus;
+      targetRecord.trialCompoundName = updatedTrial.trialCompoundName;
+      targetRecord.trialPhase = updatedTrial.trialPhase;
+      targetRecord.trialCountryCode = updatedTrial.trialCountryCode;
+      targetRecord.trialStatus = updatedTrial.trialStatus;
+      targetRecord.trialStatusDescription = updatedTrial.trialStatusDescription;
       return await targetRecord.save();
     });
   } catch (error) {

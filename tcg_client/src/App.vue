@@ -5,11 +5,14 @@
       <a-layout-header class="header">
         <div class="logo"/>
         <a-menu theme="dark" mode="horizontal" v-model:selectedKeys="menuSelectedKeys" class="menu">
-          <a-menu-item key="1" @click="pushRoute('code-list')">
+          <a-menu-item key="1" @click="pushRoute('trial-list')">
             Trial Code List
           </a-menu-item>
           <a-menu-item key="2" @click="pushRoute('code-gen')">
             Trial Code Generator
+          </a-menu-item>
+          <a-menu-item key="3" @click="pushRoute('trial-summary')">
+            Trial Summary
           </a-menu-item>
         </a-menu>
       </a-layout-header>
@@ -19,7 +22,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" style="text-align: center">
-        HENGRUI MEDICINE ©2020
+        HENGRUI MEDICINE ©2020 -- Trial Code Generator Version 1.0.0
       </a-layout-footer>
     </a-layout>
   </a-config-provider>
@@ -41,8 +44,9 @@ export default {
   computed: {
     menuSelectedKeys: function () {
       const menuKeysRouterNameMap = new Map();
-      menuKeysRouterNameMap.set( 'code-list', ['1'])
-      .set('code-gen', ['2']);
+      menuKeysRouterNameMap.set( 'trial-list', ['1'])
+          .set('code-gen', ['2'])
+          .set('trial-summary', ['3']);
       return menuKeysRouterNameMap.get(this.$route.name);
     },
   },
