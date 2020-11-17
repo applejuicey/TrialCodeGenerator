@@ -1,4 +1,5 @@
 module.exports = {
+  publicPath: '/tcg/',
   chainWebpack: config => {
     config
       .plugin('html')
