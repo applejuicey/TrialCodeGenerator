@@ -6,13 +6,13 @@
         <div class="logo"/>
         <a-menu theme="dark" mode="horizontal" v-model:selectedKeys="menuSelectedKeys" class="menu">
           <a-menu-item key="1" @click="pushRoute('trial-list')">
-            Trial Code List
+            Control Panel
           </a-menu-item>
           <a-menu-item key="2" @click="pushRoute('code-gen')">
             Trial Code Generator
           </a-menu-item>
           <a-menu-item key="3" @click="pushRoute('trial-summary')">
-            Trial Summary
+            Summary Table
           </a-menu-item>
         </a-menu>
       </a-layout-header>

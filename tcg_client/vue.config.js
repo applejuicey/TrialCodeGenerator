@@ -14,7 +14,7 @@ module.exports = {
     open: false,
     proxy: {
       "/api": {
-        target: "http://10.10.8.21:3000/api",
+        target: "http://10.10.8.21:26108/api",
         // target: "http://localhost:4359/api",
         changeOrigin: true,
         ws: true,
