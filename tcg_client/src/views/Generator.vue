@@ -6,8 +6,8 @@
         <span>Trial Code Generator</span>
       </div>
       <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
-        <a-form-item label="Compound Code">
-          <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound code" type="text"/>
+        <a-form-item label="Compound Name">
+          <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"/>
         </a-form-item>
         <a-form-item label="Trial Phase">
           <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
@@ -91,7 +91,6 @@ export default {
     this.$notification['info']({
       message: 'Welcome',
       description: 'Hi, nice to meet you! If you have any suggestion or bug report on this public test version, feel free to contact us through fanyang@hrglobe.cn.',
-      duration: 10000,
     });
   },
   methods: {

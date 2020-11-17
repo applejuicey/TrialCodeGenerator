@@ -1,6 +1,6 @@
 const Router = require('@koa/router');
 const router = new Router();
-const { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial } = require('../controllers/TrialController');
+const { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial, getSummary } = require('../controllers/TrialController');
 
 router.post('/api/generate', async (ctx, next) => {
   let result;
@@ -83,6 +83,28 @@ router.post('/api/delete', async (ctx, next) => {
       error: {
         message: `unknown error when delete one trial: ${error}`,
         errorCode: '0_DELETE_TRIAL',
+      },
+    };
+  } finally {
+    ctx.response.body = result;
+  }
+});
+
+router.post('/api/summary', async (ctx, next) => {
+  let result;
+  try {
+    const queryResults = await getSummary(ctx.request.body.summaryParams);
+    result = {
+      statusCode: "1",
+      queryResults: queryResults,
+    };
+  } catch (error) {
+    console.error(error);
+    result = {
+      statusCode: "0",
+      error: {
+        message: `unknown error when doing batch queries: ${error}`,
+        errorCode: '0_SUMMARY_QUERY',
       },
     };
   } finally {

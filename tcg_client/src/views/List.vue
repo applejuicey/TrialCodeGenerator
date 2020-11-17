@@ -6,30 +6,50 @@
         <template v-slot:icon><smile-outlined/></template>
         <template v-slot:description>
           <p>
-            All trials are listed in the table where
-            <span style="color: #8ccded">
-             <sort-descending-outlined/>sorting
-            </span>
-            and
-            <span style="color: #8ccded">
-             <filter-outlined/>filtering
-            </span>
-            functions can be employed through the header.
+            On this page, you can have a good command of all trials stored in the database.
           </p>
           <ul>
             <li>
-              Click the
-              <span style="color: #8ccded">
-                <sort-descending-outlined/>sorting
-              </span>
-              icon to sort the column.
+              All records will be loaded from the server automatically upon mounting of this page.
+              Any successful change on the record will trigger a data refreshing.
             </li>
             <li>
-              Click the
-              <span style="color: #8ccded">
-                <filter-outlined/>filtering
-              </span>
+              The unique trial code is listed in the '<b>Trial Code</b>' column.
+            </li>
+            <li>
+              The compound name is listed in the '<b>Compound Name</b>' column.
+              This information will be used when generating the unique trial code.
+              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>' and '<span class="ant-blue"><SearchOutlined/>Searching</span>'
+              functions are implemented in the '<b>Compound Name</b>' column.
+              You can input a compound name in the popup box after clicking the '<span class="ant-blue"><SearchOutlined/>Searching</span>' icon to execute a more accurate search.
+            </li>
+            <li>
+              An exhaustive list of '<span class="ant-green">Confirmed</span>',
+              '<span class="ant-blue">Processing</span>' and
+              '<span class="ant-red">Deleted</span>' is employed in the '<b>Status</b>' column.
+              Click the '<span class="ant-blue"><FilterOutlined/>Filtering</span>'
               icon to filter the column.
+            </li>
+            <li>
+              A description of change of trial status or other important information is listed in the '<b>Status Description</b>' column.
+            </li>
+            <li>
+              The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
+            </li>
+            <li>
+              The '<b>Time Stamp</b>' column provides the date that the record was created.
+            </li>
+            <li>
+              An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Phase</b>' column to mark the trial phase.
+              This information will be used when generating the unique trial code.
+            </li>
+            <li>
+              The '<b>NO.</b>' column presents the non-repeated number of a specific trial under a specific compound.
+              This information will be used when generating the unique trial code.
+            </li>
+            <li>
+              The '<b>Action</b>' column provides you with the ability to edit the record in the same row.
+              A modal with an edit form will be shown after clicking the '<span class="ant-blue"><EditOutlined/>Edit</span>' button.
             </li>
           </ul>
         </template>
@@ -323,7 +343,6 @@ export default {
     },
     handleOk(e) {
       this.modelSpec.confirmLoading = true;
-      console.log('aa', this.recordEditForm)
       this.$axios.patch(
           '/update',
           {
@@ -358,5 +377,14 @@ export default {
 }
 .content .divider {
   background-color: rgb(240, 242, 245);
+}
+.ant-blue {
+  color: #108ee9;
+}
+.ant-green {
+  color: #87d068;
+}
+.ant-red {
+  color: #f50;
 }
 </style>

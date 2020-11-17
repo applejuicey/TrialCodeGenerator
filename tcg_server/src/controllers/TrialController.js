@@ -94,4 +94,27 @@ const deleteOneTrial = async function(trialUUID) {
   }
 };
 
-module.exports = { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial };
+// get summary results
+const getSummary = async function(summaryParams) {
+  try {
+    if (summaryParams.compoundNames.includes('ALL')) {
+      return await Trial.findAll({
+        where: {
+          trialStatus: 's1',
+        },
+      });
+    }
+    return await Trial.findAll({
+      where: {
+        trialCompoundName: {
+          [Op.in]: summaryParams.compoundNames,
+        },
+        trialStatus: 's1',
+      },
+    });
+  } catch (error) {
+    console.error(error)
+  }
+};
+
+module.exports = { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial, getSummary };
