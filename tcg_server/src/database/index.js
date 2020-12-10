@@ -17,6 +17,12 @@ const sequelize = new Sequelize(databaseConfig.databaseName, databaseConfig.user
     min: 0,
     idle: 10000,
   },
+  define: {
+    charset: 'utf8',
+    dialectOptions: {
+      collate: 'utf8_general_ci',
+    },
+  },
 });
 
 async function databaseConnectionTest () {

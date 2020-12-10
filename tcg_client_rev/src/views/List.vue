@@ -1,63 +1,63 @@
 <template>
-  <a-row>
+  <div>
+    <a-row>
 
-    <a-col :lg="24" class="content">
-      <a-alert message="Instructions" type="info" show-icon class="instruction">
-        <template v-slot:icon><smile-outlined/></template>
-        <template v-slot:description>
-          <p>
-            On this page, you can have a good command of all trials stored in the database.
-          </p>
-          <ul>
-            <li>
-              All records will be loaded from the server automatically upon mounting of this page.
-              Any successful change on the record will trigger a data refreshing.
-            </li>
-            <li>
-              The unique trial code is listed in the '<b>Trial Code</b>' column.
-            </li>
-            <li>
-              The compound name is listed in the '<b>Compound Name</b>' column.
-              This information will be used when generating the unique trial code.
-              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>' and '<span class="ant-blue"><SearchOutlined/>Searching</span>'
-              functions are implemented in the '<b>Compound Name</b>' column.
-              You can input a compound name in the popup box after clicking the '<span class="ant-blue"><SearchOutlined/>Searching</span>' icon to execute a more accurate search.
-            </li>
-            <li>
-              An exhaustive list of '<span class="ant-green">Confirmed</span>',
-              '<span class="ant-blue">Processing</span>' and
-              '<span class="ant-red">Suspended</span>' is employed in the '<b>Status</b>' column.
-              Click the '<span class="ant-blue"><FilterOutlined/>Filtering</span>'
-              icon to filter the column.
-            </li>
-            <li>
-              A description of change of trial status or other important information is listed in the '<b>Status Description</b>' column.
-            </li>
-            <li>
-              The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
-            </li>
-            <li>
-              The '<b>Time Stamp</b>' column provides the date that the record was created.
-            </li>
-            <li>
-              An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Phase</b>' column to mark the trial phase.
-              This information will be used when generating the unique trial code.
-            </li>
-            <li>
-              The '<b>NO.</b>' column presents the non-repeated number of a specific trial under a specific compound.
-              This information will be used when generating the unique trial code.
-            </li>
-            <li>
-              The '<b>Action</b>' column provides you with the ability to edit the record in the same row.
-              A modal with an edit form will be shown after clicking the '<span class="ant-blue"><EditOutlined/>Edit</span>' button.
-            </li>
-          </ul>
-        </template>
-      </a-alert>
-      <div class="divider">
-        &nbsp;
-      </div>
-      <div class="my-table-wrapper">
+      <a-col :lg="24" class="content">
+        <a-alert message="Instructions" type="info" show-icon class="instruction">
+          <template v-slot:icon><smile-outlined/></template>
+          <template v-slot:description>
+            <p>
+              On this page, you can have a good command of all trials stored in the database.
+            </p>
+            <ul>
+              <li>
+                All records will be loaded from the server automatically upon mounting of this page.
+                Any successful change on the record will trigger a data refreshing.
+              </li>
+              <li>
+                The unique trial code is listed in the '<b>Trial Code</b>' column.
+              </li>
+              <li>
+                The compound name is listed in the '<b>Compound Name</b>' column.
+                This information will be used when generating the unique trial code.
+                '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>' and '<span class="ant-blue"><SearchOutlined/>Searching</span>'
+                functions are implemented in the '<b>Compound Name</b>' column.
+                You can input a compound name in the popup box after clicking the '<span class="ant-blue"><SearchOutlined/>Searching</span>' icon to execute a more accurate search.
+              </li>
+              <li>
+                An exhaustive list of '<span class="ant-green">Confirmed</span>',
+                '<span class="ant-blue">Processing</span>' and
+                '<span class="ant-red">Deleted</span>' is employed in the '<b>Status</b>' column.
+                Click the '<span class="ant-blue"><FilterOutlined/>Filtering</span>'
+                icon to filter the column.
+              </li>
+              <li>
+                A description of change of trial status or other important information is listed in the '<b>Status Description</b>' column.
+              </li>
+              <li>
+                The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
+              </li>
+              <li>
+                The '<b>Time Stamp</b>' column provides the date that the record was created.
+              </li>
+              <li>
+                An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Phase</b>' column to mark the trial phase.
+                This information will be used when generating the unique trial code.
+              </li>
+              <li>
+                The '<b>NO.</b>' column presents the non-repeated number of a specific trial under a specific compound.
+                This information will be used when generating the unique trial code.
+              </li>
+              <li>
+                The '<b>Action</b>' column provides you with the ability to edit the record in the same row.
+                A modal with an edit form will be shown after clicking the '<span class="ant-blue"><EditOutlined/>Edit</span>' button.
+              </li>
+            </ul>
+          </template>
+        </a-alert>
+        <div class="divider">
+          &nbsp;
+        </div>
         <a-table
             :scroll="{ x: 'max-content', y: 'max-content' }"
             :columns="tableSpec.columns"
@@ -112,18 +112,18 @@
             <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
               <a-form layout="vertical" :model="recordEditForm">
                 <a-form-item label="Compound Name">
-                  <a-input v-model:value="recordEditForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName"/>
+                  <a-input v-model:value="recordEditForm.trialCompoundName" placeholder="Please input the compound name" type="text"/>
                 </a-form-item>
-                <a-form-item label="Trial Status" >
-                  <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a trial status" :disabled="['t2'].includes(test.userType) && ['s1'].includes(recordEditForm.trialStatus)">
+                <a-form-item label="Trial Status">
+                  <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a trial status">
                     <a-select-option value="s0">
                       Proposed
                     </a-select-option>
-                    <a-select-option value="s1" v-if="!(['t2'].includes(test.userType) && ['s0', 's2'].includes(recordEditForm.trialStatus))">
+                    <a-select-option value="s1">
                       Confirmed
                     </a-select-option>
                     <a-select-option value="s2">
-                      Suspended
+                      Deleted
                     </a-select-option>
                   </a-select>
                 </a-form-item>
@@ -147,17 +147,16 @@
                   </a-select>
                 </a-form-item>
                 <a-form-item label="Country Code">
-                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text" @blur="standardiseTrialCountryCode"/>
+                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text"/>
                 </a-form-item>
               </a-form>
             </a-modal>
           </template>
         </a-table>
-      </div>
+      </a-col>
 
-    </a-col>
-
-  </a-row>
+    </a-row>
+  </div>
 </template>
 
 <script>
@@ -169,8 +168,8 @@ import {
   SortDescendingOutlined,
   FilterOutlined,
 } from '@ant-design/icons-vue';
-import country from "country-list-js";
 export default {
+  name: 'Home',
   components: {
     SmileOutlined,
     SearchOutlined,
@@ -181,11 +180,11 @@ export default {
   },
   data() {
     return {
-      test: JSON.parse(localStorage.getItem('userInfo')),
-      trialStatusArray: [],
       queryParams: {
-        results: 20,
+        results: 10,
         page: 1,
+        sortField: 'trialCompoundName',
+        sortOrder: 'ascend',
         filters: {},
       },
       tableSpec: {
@@ -200,11 +199,7 @@ export default {
           {
             title: 'Compound Name',
             dataIndex: 'trialCompoundName',
-            sorter: (a, b) => {
-              return a.trialCompoundName.localeCompare(b.trialCompoundName)
-            },
-            defaultSortOrder: 'ascend',
-            sortDirections: ['descend', 'ascend'],
+            sorter: true,
             slots: {
               filterDropdown: 'filterDropdown',
               filterIcon: 'filterIcon',
@@ -217,7 +212,7 @@ export default {
             filters: [
               { text: 'Proposed', value: 's0' },
               { text: 'Confirmed', value: 's1' },
-              { text: 'Suspended', value: 's2' },
+              { text: 'Deleted', value: 's2' },
             ],
             slots: { customRender: 'trialStatus' },
             width: '120px',
@@ -230,40 +225,27 @@ export default {
           {
             title: 'Country',
             dataIndex: 'trialCountryCode',
-            sorter: (a, b) => {
-              a.trialCountryCode = a.trialCountryCode? a.trialCountryCode : '';
-              b.trialCountryCode = b.trialCountryCode? b.trialCountryCode : '';
-              return a.trialCountryCode.localeCompare(b.trialCountryCode);
-            },
-            sortDirections: ['descend', 'ascend'],
+            sorter: true,
             width: '120px',
           },
           {
             title: 'Time Stamp',
             dataIndex: 'trialGenerationDate',
-            sorter: (a, b) => {
-              return a.trialGenerationDate.localeCompare(b.trialGenerationDate);
-            },
-            sortDirections: ['descend', 'ascend'],
+            sorter: true,
             slots: { customRender: 'trialGenerationDate' },
             width: '150px',
           },
           {
             title: 'Phase',
             dataIndex: 'trialPhase',
-            sorter: (a, b) => {
-              return a.trialPhase.localeCompare(b.trialPhase);
-            },
+            sorter: true,
             slots: { customRender: 'trialPhase' },
             width: '100px',
           },
           {
             title: 'NO.',
             dataIndex: 'trialUniqueSequenceCode',
-            sorter: (a, b) => {
-              return a.trialUniqueSequenceCode.toString().localeCompare(b.trialUniqueSequenceCode.toString());
-            },
-            sortDirections: ['descend', 'ascend'],
+            sorter: true,
             width: '80px',
           },
           {
@@ -275,9 +257,7 @@ export default {
           },
         ],
         data: [],
-        pagination: {
-          defaultPageSize: 20,
-        },
+        pagination: {},
         loading: false,
       },
       modelSpec: {
@@ -288,42 +268,6 @@ export default {
       recordEditForm: {},
     };
   },
-  computed: {
-    // userInfo: function () {
-    //   JSON.parse(localStorage.getItem('userInfo'));
-    // },
-  },
-  created() {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    if (['t0', 't1'].includes(userInfo.userType)) {
-      this.trialStatusArray = [
-        {
-          description: 'Proposed',
-          value: 's0',
-        },
-        {
-          description: 'Confirmed',
-          value: 's1',
-        },
-        {
-          description: 'Suspended',
-          value: 's2',
-        },
-      ];
-    }
-    if (['t2'].includes(userInfo.userType)) {
-      this.trialStatusArray = [
-        {
-          description: 'Proposed',
-          value: 's0',
-        },
-        {
-          description: 'Suspended',
-          value: 's2',
-        },
-      ];
-    }
-    },
   mounted() {
     this.fetch();
   },
@@ -339,7 +283,7 @@ export default {
     fetch: function () {
       this.tableSpec.loading = true;
       this.$axios.post(
-          '/trial/batchQuery',
+          '/batchQuery',
           {
             batchQueryParams: this.queryParams,
           },
@@ -379,7 +323,7 @@ export default {
       const statusMap = new Map();
       statusMap.set('s0', ['Proposed', 'processing', '#108ee9'])
           .set('s1', ['Confirmed', 'success', '#87d068'])
-          .set('s2', ['Suspended', 'error', '#f50']);
+          .set('s2', ['Deleted', 'error', '#f50']);
       return {
         text: statusMap.get(value)[0],
         status: statusMap.get(value)[1],
@@ -394,60 +338,15 @@ export default {
       phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
       return phaseMap.get(value);
     },
-    formatTrialUniqueSequenceCode: function (value) {
-      let stringifiedSequenceCode = value.toString();
-      if (stringifiedSequenceCode.length === 1 ) {
-        return '0' + stringifiedSequenceCode;
-      } else {
-        return stringifiedSequenceCode;
-      }
-    },
-    formatTrialCountryCode: function (value) {
-      if (value === 'CHN') {
-        return '';
-      } else {
-        return '-' + value;
-      }
-    },
     formatTrialCode: function (trialRecord) {
-      return trialRecord.trialCompoundName + '-' + trialRecord.trialPhase.substr(1, 1) +
-          this.formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode) +
-          this.formatTrialCountryCode(trialRecord.trialCountryCode);
-    },
-    standardiseTrialCompoundName: function () {
-      try {
-        this.recordEditForm.trialCompoundName = this.recordEditForm.trialCompoundName.trim().toUpperCase();
-      } catch (error) {
-        this.$message.error('Please provide a valid compound name!', 6);
-      }
-    },
-    standardiseTrialCountryCode: function () {
-      let initialUpperCase = (someString) => {
-        someString = someString.toLowerCase();
-        let [initial, ...rest] = someString;
-        return initial.toUpperCase() + rest.join('');
-      };
-      try {
-        let foundCountryByISO3 = country.findByIso3(this.recordEditForm.trialCountryCode.trim().toUpperCase());
-        if (foundCountryByISO3) {
-          this.recordEditForm.trialCountryCode = this.recordEditForm.trialCountryCode.trim().toUpperCase();
-          return true;
-        }
-        let foundCountryByName = country.findByName(initialUpperCase(this.recordEditForm.trialCountryCode.trim()));
-        if (foundCountryByName) {
-          this.recordEditForm.trialCountryCode = foundCountryByName.code.iso3.trim();
-          return true;
-        }
-        this.$message.error(`The country '${ this.recordEditForm.trialCountryCode.trim() }' cannot be found according to ISO 3166. Please confirm your input!`, 6);
-        this.recordEditForm.trialCountryCode = undefined;
-      } catch (error) {
-        this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
-      }
+      return trialRecord.trialCompoundName + '-' + this.formatTrialPhase(trialRecord.trialPhase) + '-' +
+          trialRecord.trialPhase.substr(1, 1) + trialRecord.trialUniqueSequenceCode +
+          (trialRecord.trialCountryCode? ('-' + trialRecord.trialCountryCode) : '');
     },
     handleOk(e) {
       this.modelSpec.confirmLoading = true;
       this.$axios.patch(
-          '/trial/update',
+          '/update',
           {
             updatedTrial: this.recordEditForm,
           },
@@ -475,5 +374,19 @@ export default {
 </script>
 
 <style scoped>
-
+.content .ant-table-wrapper {
+  padding: 10px;
+}
+.content .divider {
+  background-color: rgb(240, 242, 245);
+}
+.ant-blue {
+  color: #108ee9;
+}
+.ant-green {
+  color: #87d068;
+}
+.ant-red {
+  color: #f50;
+}
 </style>

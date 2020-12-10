@@ -1,45 +1,45 @@
 <template>
-  <a-row>
+  <div>
+    <a-row>
 
-    <a-col :lg="24" class="content">
-      <a-alert message="Instructions" type="info" show-icon class="instruction">
-        <template v-slot:icon><smile-outlined/></template>
-        <template v-slot:description>
-          <p>
-            On this page, you can get a summary table of one or more specific compounds.
+      <a-col :lg="24" class="content">
+        <a-alert message="Instructions" type="info" show-icon class="instruction">
+          <template v-slot:icon><smile-outlined/></template>
+          <template v-slot:description>
+            <p>
+              On this page, you can get a summary table of one or more specific compounds.
             </p>
-          <ol>
-            <li>
-              You should first type in the compound names in the text area on the left side (sometimes it may expand the full width across your screen).
-              The compound names should be separated by commas, for example,
-              <br>
-              <code class="ant-green">SHR1210, SHR3680</code>&nbsp;
-              <CopyOutlined class="ant-blue" @click="copyToClipBoard('SHR1210, SHR3680')"/>
-              <br>
-              If you want to draw a comprehensive summary list of all compounds, you can input as follows:
-              <br>
-              <code class="ant-green">ALL</code>&nbsp;
-              <CopyOutlined class="ant-blue" @click="copyToClipBoard('ALL')"/>&nbsp;
-              <DownCircleOutlined class="ant-blue" @click="setTextareaValue('ALL')"/>
-            </li>
-            <li>
-              Click the '<span class="ant-blue">Submit</span>' button to execute the query.
-            </li>
-            <li>
-              Hit targets will be shown in the table on the right side (sometimes the summary table may fall under the input text area).
-              A total count of all '<span class="ant-green">Confirmed</span>' trials of a specific compound will be placed in the '<b>Count</b>' column.
-              A more detailed presentation of trial phase distribution of the compound can be achieved by clicking the
-              '<span class="ant-blue"><PlusSquareOutlined/>Inspect</span>' icon.
-            </li>
-          </ol>
-        </template>
-      </a-alert>
-      <div class="divider">
-        &nbsp;
-      </div>
-      <a-row :gutter="22">
-        <a-col :sm="24" :md="12" :xl="8">
-          <div class="my-table-wrapper">
+            <ol>
+              <li>
+                You should first type in the compound names in the text area on the left side (sometimes it may expand the full width across your screen).
+                The compound names should be separated by commas, for example,
+                <br>
+                <code class="ant-green">SHR1210, SHR3680</code>&nbsp;
+                <CopyOutlined class="ant-blue" @click="copyToClipBoard('SHR1210, SHR3680')"/>
+                <br>
+                If you want to draw a comprehensive summary list of all compounds, you can input as follows:
+                <br>
+                <code class="ant-green">ALL</code>&nbsp;
+                <CopyOutlined class="ant-blue" @click="copyToClipBoard('ALL')"/>&nbsp;
+                <DownCircleOutlined class="ant-blue" @click="setTextareaValue('ALL')"/>
+              </li>
+              <li>
+                Click the '<span class="ant-blue">Submit</span>' button to execute the query.
+              </li>
+              <li>
+                Hit targets will be shown in the table on the right side (sometimes the summary table may fall under the input text area).
+                A total count of all '<span class="ant-green">Confirmed</span>' trials of a specific compound will be placed in the '<b>Count</b>' column.
+                A more detailed presentation of trial phase distribution of the compound can be achieved by clicking the
+                '<span class="ant-blue"><PlusSquareOutlined/>Inspect</span>' icon.
+              </li>
+            </ol>
+          </template>
+        </a-alert>
+        <div class="divider">
+          &nbsp;
+        </div>
+        <a-row>
+          <a-col :sm="24" :md="12" :xl="8">
             <a-form :model="queryForm" :layout="queryForm.layout" class="query-form">
               <a-form-item label="Compound Name">
                 <a-textarea v-model:value="queryForm.queryExpression" placeholder="Please input the compound names here (should be separated by comma)" type="text"/>
@@ -51,10 +51,8 @@
                 <a-spin v-else/>
               </a-form-item>
             </a-form>
-          </div>
-        </a-col>
-        <a-col :sm="24" :md="12" :xl="16">
-          <div class="my-table-wrapper">
+          </a-col>
+          <a-col :sm="24" :md="12" :xl="16">
             <a-table
                 :scroll="{ x: 'max-content', y: 'max-content' }"
                 :columns="tableSpec.columns"
@@ -67,12 +65,12 @@
                 <span>{{ formatTrialPhase(text) }}</span>
               </template>
             </a-table>
-          </div>
-        </a-col>
-      </a-row>
-    </a-col>
+          </a-col>
+        </a-row>
+      </a-col>
 
-  </a-row>
+    </a-row>
+  </div>
 </template>
 
 <script>
@@ -83,6 +81,7 @@ import {
   DownCircleOutlined,
 } from "@ant-design/icons-vue";
 export default {
+  name: 'TrialSummary',
   components: {
     SmileOutlined,
     PlusSquareOutlined,
@@ -132,7 +131,7 @@ export default {
         return name.trim();
       })
       this.$axios.post(
-          '/trial/summary',
+          '/summary',
           {
             summaryParams: {
               compoundNames: compoundNames,
@@ -207,7 +206,22 @@ export default {
 </script>
 
 <style scoped>
+.query-form {
+  padding: 24px 24px 0 24px;
+}
 .button-container {
   text-align: center;
+}
+.content .ant-table-wrapper {
+  padding: 10px;
+}
+.content .divider {
+  background-color: rgb(240, 242, 245);
+}
+.ant-blue {
+  color: #108ee9;
+}
+.ant-green {
+  color: #87d068;
 }
 </style>

@@ -49,13 +49,23 @@ Trial.init({
   },
   trialCountryCode: {
     type: Sequelize.STRING(100),
-    allowNull: true,
+    allowNull: false,
+    validate: {
+      notNull: {
+        msg: 'the country code of the trial should be specified'
+      },
+    },
   },
   trialStatus: {
     type: Sequelize.ENUM,
     values: ['s0', 's1', 's2'],
     allowNull: false,
     defaultValue: "s0",
+    validate: {
+      notNull: {
+        msg: 'the status of the trial should be specified'
+      },
+    },
   },
   trialStatusDescription: {
     type: Sequelize.STRING(255),

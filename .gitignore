@@ -1,7 +1,7 @@
 .DS_Store
 node_modules
 /dist
-
+/tcg_client_rev
 
 # local env files
 .env.local

@@ -45,9 +45,9 @@ const getSpecificTrials = async function(batchQueryParams) {
     queryResults.hitTargets = await Trial.findAll({
       offset: batchQueryParams.results * (batchQueryParams.page - 1),
       limit: batchQueryParams.results,
-      order: [
-        [batchQueryParams.sortField, batchQueryParams.sortOrder === 'descend'? 'DESC' : 'ASC'],
-      ],
+      // order: [
+      //   [batchQueryParams.sortField, batchQueryParams.sortOrder === 'descend'? 'DESC' : 'ASC'],
+      // ],
       where: queryFilters,
     });
     queryResults.totalCount = await Trial.count();

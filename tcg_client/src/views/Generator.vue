@@ -1,67 +1,101 @@
 <template>
-  <a-layout id="code-generator">
+  <a-row>
 
-    <a-layout-content class="generatorForm" v-if="!submitted">
-      <div class="header">
-        <span>Trial Code Generator</span>
-      </div>
-      <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
-        <a-form-item label="Compound Name">
-          <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"/>
-        </a-form-item>
-        <a-form-item label="Trial Phase">
-          <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
-            <a-select-option value="p1">
-              Phase I
-            </a-select-option>
-            <a-select-option value="p2">
-              Phase II
-            </a-select-option>
-            <a-select-option value="p3">
-              Phase III
-            </a-select-option>
-            <a-select-option value="p4">
-              Phase IV
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-        <a-form-item label="Date of Generation">
-          <a-date-picker v-model:value="codeGeneratorForm.trialGenerationDate" type="date"/>
-        </a-form-item>
-        <a-form-item label="Enable Country Code">
-          <a-switch v-model:checked="codeGeneratorForm.countryCodeFlag"/>
-        </a-form-item>
-        <a-form-item label="Country Code" v-if="codeGeneratorForm.countryCodeFlag === true">
-          <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text"/>
-        </a-form-item>
-        <a-form-item :wrapper-col="wrapperColButton" class="button-container">
-          <a-button type="primary" @click="generateTrialCode" v-if="!waiting">
-            Generate
-          </a-button>
-          <a-spin v-else/>
-        </a-form-item>
-      </a-form>
-    </a-layout-content>
-
-    <a-layout-content class="submitResult" v-else>
-      <a-result :status="submissionResult.status" :title="submissionResult.title"
-          :sub-title="submissionResult.subTitle">
-        <template #extra>
-          <a-button type="primary" @click="pushRoute('trial-list')">
-            Trial List
-          </a-button>
+    <a-col :lg="24" class="content">
+      <a-alert message="Instructions" type="info" show-icon class="instruction">
+        <template v-slot:icon><smile-outlined/></template>
+        <template v-slot:description>
+          <p>
+            On this page, you can fill in and submit the following form to upload the required information for requesting a trial code.
+          </p>
+          <ul>
+            <li>
+              The '<b>Compound Name</b>' will be converted automatically to capital letters.
+              We suggest that spaces should not be included in the middle of the compound name.
+              This information will be used when generating the unique trial code.
+            </li>
+            <li>
+              An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Trial Phase</b>' dropdown selector.
+              This information will be used when generating the unique trial code.
+            </li>
+            <li>
+              The '<b>Date of Generation</b>' calendar dropdown selector provides the date that the record was created.
+            </li>
+            <li>
+              The '<b>Country Code</b>' should be an valid Alpha-3 code (e.g. <span class="ant-green">CHN</span>) or the english short name (e.g. <span class="ant-green">China</span>) of the country according to the
+              <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>.
+            </li>
+          </ul>
         </template>
-      </a-result>
-    </a-layout-content>
+      </a-alert>
+      <div class="divider">
+        &nbsp;
+      </div>
+      <div class="generatorForm" v-if="!submitted">
+        <div class="header">
+          <span>Trial Code Generator</span>
+        </div>
+        <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
+          <a-form-item label="Compound Name">
+            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName" autofocus/>
+          </a-form-item>
+          <a-form-item label="Trial Phase">
+            <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
+              <a-select-option value="p1">
+                Phase I
+              </a-select-option>
+              <a-select-option value="p2">
+                Phase II
+              </a-select-option>
+              <a-select-option value="p3">
+                Phase III
+              </a-select-option>
+              <a-select-option value="p4">
+                Phase IV
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="Date of Generation">
+            <a-date-picker v-model:value="codeGeneratorForm.trialGenerationDate" type="date"/>
+          </a-form-item>
+          <a-form-item label="Country Code">
+            <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text" placeholder="Please input the 3-letter country code or country name" @blur="standardiseTrialCountryCode"/>
+          </a-form-item>
+          <a-form-item :wrapper-col="wrapperColButton" class="button-container">
+            <a-button type="primary" @click="generateTrialCode" v-if="!waiting">
+              Generate
+            </a-button>
+            <a-spin v-else/>
+          </a-form-item>
+        </a-form>
+      </div>
+      <div class="submitResult" v-else>
+        <a-result :status="submissionResult.status" :title="submissionResult.title"
+                  :sub-title="submissionResult.subTitle">
+          <template #extra>
+            <a-button type="primary" @click="pushRoute('trial-list')">
+              Trial List
+            </a-button>
+          </template>
+        </a-result>
+      </div>
+    </a-col>
 
-  </a-layout>
+  </a-row>
 </template>
 
 <script>
 import moment from 'moment';
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons-vue';
+import country from 'country-list-js';
+import {
+  SmileOutlined,
+  UserOutlined,
+  LaptopOutlined,
+  NotificationOutlined,
+} from '@ant-design/icons-vue';
 export default {
   components: {
+    SmileOutlined,
     UserOutlined,
     LaptopOutlined,
     NotificationOutlined,
@@ -77,7 +111,6 @@ export default {
         trialCompoundName: undefined,
         trialPhase: undefined,
         trialGenerationDate: moment(new Date(), 'YYYY-MM-DD'),
-        countryCodeFlag: false,
         trialCountryCode: undefined,
       },
       submissionResult: {
@@ -94,20 +127,65 @@ export default {
     });
   },
   methods: {
+    standardiseTrialCompoundName: function () {
+      try {
+        this.codeGeneratorForm.trialCompoundName = this.codeGeneratorForm.trialCompoundName.trim().toUpperCase();
+      } catch (error) {
+        this.$message.error('Please provide a valid compound name!', 6);
+      }
+    },
+    standardiseTrialCountryCode: function () {
+      let initialUpperCase = (someString) => {
+        someString = someString.toLowerCase();
+        let [initial, ...rest] = someString;
+        return initial.toUpperCase() + rest.join('');
+      };
+      try {
+        let foundCountryByISO3 = country.findByIso3(this.codeGeneratorForm.trialCountryCode.trim().toUpperCase());
+        if (foundCountryByISO3) {
+          this.codeGeneratorForm.trialCountryCode = this.codeGeneratorForm.trialCountryCode.trim().toUpperCase();
+          return true;
+        }
+        let foundCountryByName = country.findByName(initialUpperCase(this.codeGeneratorForm.trialCountryCode.trim()));
+        if (foundCountryByName) {
+          this.codeGeneratorForm.trialCountryCode = foundCountryByName.code.iso3.trim();
+          return true;
+        }
+        this.$message.error(`The country '${ this.codeGeneratorForm.trialCountryCode.trim() }' cannot be found according to ISO 3166. Please confirm your input!`, 6);
+        this.codeGeneratorForm.trialCountryCode = undefined;
+      } catch (error) {
+        this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
+      }
+    },
     formatTrialPhase: function (value) {
       const phaseMap = new Map();
       phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
       return phaseMap.get(value);
     },
+    formatTrialUniqueSequenceCode: function (value) {
+      let stringifiedSequenceCode = value.toString();
+      if (stringifiedSequenceCode.length === 1 ) {
+        return '0' + stringifiedSequenceCode;
+      } else {
+        return stringifiedSequenceCode;
+      }
+    },
+    formatTrialCountryCode: function (value) {
+      if (value === 'CHN') {
+        return '';
+      } else {
+        return '-' + value;
+      }
+    },
     formatTrialCode: function (trialRecord) {
-      return trialRecord.trialCompoundName + '-' + this.formatTrialPhase(trialRecord.trialPhase) + '-' +
-          trialRecord.trialPhase.substr(1, 1) + trialRecord.trialUniqueSequenceCode +
-          (trialRecord.trialCountryCode? ('-' + trialRecord.trialCountryCode) : '');
+      return trialRecord.trialCompoundName + '-' + trialRecord.trialPhase.substr(1, 1) +
+          this.formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode) +
+          this.formatTrialCountryCode(trialRecord.trialCountryCode);
     },
     generateTrialCode: function () {
       this.waiting = true;
       this.$axios.post(
-          '/generate',
+          '/trial/generate',
           {
             newTrial: this.codeGeneratorForm,
           },
@@ -139,17 +217,21 @@ export default {
 </script>
 
 <style scoped>
-#code-generator .generatorForm, .submitResult {
+.generatorForm, .submitResult {
   background-color: #fff;
   padding: 24px;
 }
-#code-generator .header {
+.header {
   font-size: xx-large;
   margin: 4px;
   padding: 4px;
   text-align: center;
 }
-#code-generator .button-container {
+.button-container {
   text-align: center;
+}
+.generatorForm {
+  border-radius: 25px;
+  background-color: #ffffffde;
 }
 </style>

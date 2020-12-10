@@ -1,0 +1,88 @@
+<template>
+
+    <a-row type="flex" justify="space-around" align="middle" class="login-form-wrapper">
+      <a-col :lg="10" :offset-lg="6">
+        <a-card title="Trial Code Generator - Login" :bordered="false">
+          <a-form :model="loginForm" :layout="loginForm.layout" class="query-form">
+            <a-form-item label="Username">
+              <a-input v-model:value="loginForm.username" placeholder="Please input the username" type="text" @pressEnter="login" autofocus/>
+            </a-form-item>
+            <a-form-item label="Password">
+              <a-input v-model:value="loginForm.password" placeholder="Please input the password" type="password" @pressEnter="login"/>
+            </a-form-item>
+            <a-form-item :wrapper-col="loginForm.wrapperColButton" class="button-container">
+              <a-button type="primary" @click="login" v-if="!loginForm.waiting">
+                Login
+              </a-button>
+              <a-spin v-else/>
+            </a-form-item>
+          </a-form>
+        </a-card>
+      </a-col>
+    </a-row>
+
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      loginForm: {
+        layout: 'vertical',
+        username: '',
+        password: '',
+        wrapperColButton: { span: 24 },
+        waiting: false,
+      },
+    }
+  },
+  methods: {
+    login: function () {
+      this.loginForm.waiting = true;
+      this.$axios.post(
+          '/login',
+          {
+            userInfo: {
+              username: this.loginForm.username,
+              password: this.loginForm.password,
+            }
+          },
+      ).then((response) => {
+        if (['1'].includes(response.data.statusCode) && (['t2'].includes(response.data.loginResult.userType))) {
+          localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
+          this.$router.push({ name: 'code-gen'});
+          return true;
+        }
+        if (['1'].includes(response.data.statusCode) && (['t0', 't1'].includes(response.data.loginResult.userType))) {
+          localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
+          this.$router.push({ name: 'trial-list'});
+          return true;
+        }
+        if (['0'].includes(response.data.statusCode) && response.data.error.message.includes('username')) {
+          this.$message.error('Invalid Username!', 6);
+          return false;
+        }
+        if (['0'].includes(response.data.statusCode) && response.data.error.message.includes('password')) {
+          this.$message.error('Invalid Password!', 6);
+          return false;
+        }
+        this.$message.error('Login Failed!', 6);
+      }).catch((error) => {
+        console.log(error);
+      }).finally(() => {
+        this.loginForm.waiting = false;
+      });
+    },
+  },
+}
+</script>
+
+<style scoped>
+.login-form-wrapper {
+  min-height: 90vh;
+  text-align: center;
+}
+.button-container {
+ margin-bottom: 0;
+}
+</style>
