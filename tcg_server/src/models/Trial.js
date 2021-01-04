@@ -20,7 +20,7 @@ Trial.init({
   },
   trialPhase: {
     type: Sequelize.ENUM,
-    values: ['p1', 'p2', 'p3', 'p4'],
+    values: ['p0', 'p1', 'p2', 'p2a', 'p2b', 'p3', 'p3a', 'p3b', 'p4', 'NA'],
     allowNull: false,
     validate: {
       notNull: {

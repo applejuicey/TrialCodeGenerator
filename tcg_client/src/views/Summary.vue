@@ -184,7 +184,12 @@ export default {
     },
     formatTrialPhase: function (value) {
       const phaseMap = new Map();
-      phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
+      phaseMap.set('p0', '0')
+          .set('p1', 'I')
+          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
+          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
+          .set('p4', 'IV')
+          .set('NA', 'NA');
       return phaseMap.get(value);
     },
     copyToClipBoard: function (text) {

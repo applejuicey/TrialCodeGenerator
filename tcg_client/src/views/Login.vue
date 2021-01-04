@@ -1,7 +1,7 @@
 <template>
 
     <a-row type="flex" justify="space-around" align="middle" class="login-form-wrapper">
-      <a-col :lg="10" :offset-lg="6">
+      <a-col :lg="12" :offset-lg="6">
         <a-card title="Trial Code Generator - Login" :bordered="false">
           <a-form :model="loginForm" :layout="loginForm.layout" class="query-form">
             <a-form-item label="Username">
@@ -68,6 +68,7 @@ export default {
         }
         this.$message.error('Login Failed!', 6);
       }).catch((error) => {
+        this.$message.error(`Login Failed! Details: ${ error }`, 6);
         console.log(error);
       }).finally(() => {
         this.loginForm.waiting = false;

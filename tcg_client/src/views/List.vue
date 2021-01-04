@@ -25,7 +25,7 @@
             </li>
             <li>
               An exhaustive list of '<span class="ant-green">Confirmed</span>',
-              '<span class="ant-blue">Processing</span>' and
+              '<span class="ant-blue">Proposed</span>' and
               '<span class="ant-red">Suspended</span>' is employed in the '<b>Status</b>' column.
               Click the '<span class="ant-blue"><FilterOutlined/>Filtering</span>'
               icon to filter the column.
@@ -35,17 +35,25 @@
             </li>
             <li>
               The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
+              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
+              function is implemented in this column.
             </li>
             <li>
               The '<b>Time Stamp</b>' column provides the date that the record was created.
+              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
+              function is implemented in this column.
             </li>
             <li>
               An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Phase</b>' column to mark the trial phase.
               This information will be used when generating the unique trial code.
+              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
+              function is implemented in this column.
             </li>
             <li>
               The '<b>NO.</b>' column presents the non-repeated number of a specific trial under a specific compound.
               This information will be used when generating the unique trial code.
+              '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
+              function is implemented in this column.
             </li>
             <li>
               The '<b>Action</b>' column provides you with the ability to edit the record in the same row.
@@ -132,17 +140,35 @@
                 </a-form-item>
                 <a-form-item label="Trial Phase">
                   <a-select v-model:value="recordEditForm.trialPhase" placeholder="Please select a trial phase">
+                    <a-select-option value="p0">
+                      Phase 0
+                    </a-select-option>
                     <a-select-option value="p1">
                       Phase I
                     </a-select-option>
                     <a-select-option value="p2">
                       Phase II
                     </a-select-option>
+                    <a-select-option value="p2a">
+                      Phase II a
+                    </a-select-option>
+                    <a-select-option value="p2b">
+                      Phase II b
+                    </a-select-option>
                     <a-select-option value="p3">
                       Phase III
                     </a-select-option>
+                    <a-select-option value="p3a">
+                      Phase III a
+                    </a-select-option>
+                    <a-select-option value="p3b">
+                      Phase III b
+                    </a-select-option>
                     <a-select-option value="p4">
                       Phase IV
+                    </a-select-option>
+                    <a-select-option value="NA">
+                      NA
                     </a-select-option>
                   </a-select>
                 </a-form-item>
@@ -391,7 +417,12 @@ export default {
     },
     formatTrialPhase: function (value) {
       const phaseMap = new Map();
-      phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
+      phaseMap.set('p0', '0')
+          .set('p1', 'I')
+          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
+          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
+          .set('p4', 'IV')
+          .set('NA', 'NA');
       return phaseMap.get(value);
     },
     formatTrialUniqueSequenceCode: function (value) {

@@ -37,21 +37,39 @@
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
-            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName" autofocus/>
+            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName"/>
           </a-form-item>
           <a-form-item label="Trial Phase">
             <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
+              <a-select-option value="p0">
+                Phase 0
+              </a-select-option>
               <a-select-option value="p1">
                 Phase I
               </a-select-option>
               <a-select-option value="p2">
                 Phase II
               </a-select-option>
+              <a-select-option value="p2a">
+                Phase II a
+              </a-select-option>
+              <a-select-option value="p2b">
+                Phase II b
+              </a-select-option>
               <a-select-option value="p3">
                 Phase III
               </a-select-option>
+              <a-select-option value="p3a">
+                Phase III a
+              </a-select-option>
+              <a-select-option value="p3b">
+                Phase III b
+              </a-select-option>
               <a-select-option value="p4">
                 Phase IV
+              </a-select-option>
+              <a-select-option value="NA">
+                NA
               </a-select-option>
             </a-select>
           </a-form-item>
@@ -132,6 +150,7 @@ export default {
         this.codeGeneratorForm.trialCompoundName = this.codeGeneratorForm.trialCompoundName.trim().toUpperCase();
       } catch (error) {
         this.$message.error('Please provide a valid compound name!', 6);
+        return 1;
       }
     },
     standardiseTrialCountryCode: function () {
@@ -155,11 +174,17 @@ export default {
         this.codeGeneratorForm.trialCountryCode = undefined;
       } catch (error) {
         this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
+        return 1;
       }
     },
     formatTrialPhase: function (value) {
       const phaseMap = new Map();
-      phaseMap.set('p1', 'I').set('p2', 'II').set('p3', 'III').set('p4', 'IV');
+      phaseMap.set('p0', '0')
+          .set('p1', 'I')
+          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
+          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
+          .set('p4', 'IV')
+          .set('NA', 'NA');
       return phaseMap.get(value);
     },
     formatTrialUniqueSequenceCode: function (value) {
@@ -183,6 +208,10 @@ export default {
           this.formatTrialCountryCode(trialRecord.trialCountryCode);
     },
     generateTrialCode: function () {
+      if (this.standardiseTrialCompoundName() || this.standardiseTrialCountryCode()) {
+        // error occurred
+        return;
+      }
       this.waiting = true;
       this.$axios.post(
           '/trial/generate',
