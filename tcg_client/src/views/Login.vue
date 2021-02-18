@@ -2,8 +2,8 @@
 
     <a-row type="flex" justify="space-around" align="middle" class="login-form-wrapper">
       <a-col :lg="12" :offset-lg="6">
-        <a-card title="Trial Code Generator - Login" :bordered="false">
-          <a-form :model="loginForm" :layout="loginForm.layout" class="query-form">
+        <a-card title="恒瑞研发部临床试验编号登记平台" :bordered="false">
+          <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">
               <a-input v-model:value="loginForm.username" placeholder="Please input the username" type="text" @pressEnter="login" autofocus/>
             </a-form-item>

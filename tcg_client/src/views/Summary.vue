@@ -153,11 +153,16 @@ export default {
       rawSummaryResults.forEach((rawRecord) => {
         if (!uniqueCompoundNames.includes(rawRecord.trialCompoundName)) {
           uniqueCompoundNames.push(rawRecord.trialCompoundName);
-          counterMatrix.push([0, 0, 0, 0]);
+          // 分别对应0 1 2 3 4 NA共6种
+          counterMatrix.push([0, 0, 0, 0, 0, 0]);
         }
       })
       rawSummaryResults.forEach((rawRecord) => {
-        counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1) - 1] ++;
+        if (rawRecord.trialPhase.substr(1, 1) === 'A') {
+          counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][5] ++;
+        } else {
+          counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
+        }
       })
       let parsedSummaryResults = [];
       for (const name of uniqueCompoundNames) {
@@ -167,12 +172,12 @@ export default {
           count: counterMatrix[uniqueCompoundNames.indexOf(name)].reduce((last, current) =>{
             return last + current;
           }),
-          children: (function (){
+          children: (function () {
             let result = [];
-            for (let i = 0; i < 4; i++) {
+            for (let i = 0; i < 6; i++) {
               result.push({
-                key: uniqueCompoundNames.indexOf(name) + '' + (i + 1),
-                trialPhase: 'p' + (i + 1),
+                key: uniqueCompoundNames.indexOf(name) + '' + i,
+                trialPhase: 'p' + i,
                 count: counterMatrix[uniqueCompoundNames.indexOf(name)][i],
               });
             }
@@ -186,10 +191,10 @@ export default {
       const phaseMap = new Map();
       phaseMap.set('p0', '0')
           .set('p1', 'I')
-          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
-          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
+          .set('p2', 'II')
+          .set('p3', 'III')
           .set('p4', 'IV')
-          .set('NA', 'NA');
+          .set('p5', 'NA');
       return phaseMap.get(value);
     },
     copyToClipBoard: function (text) {

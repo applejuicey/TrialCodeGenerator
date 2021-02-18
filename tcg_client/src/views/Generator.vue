@@ -33,7 +33,7 @@
       </div>
       <div class="generatorForm" v-if="!submitted">
         <div class="header">
-          <span>Trial Code Generator</span>
+          <span>恒瑞研发部临床试验编号登记平台</span>
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
@@ -150,8 +150,9 @@ export default {
         this.codeGeneratorForm.trialCompoundName = this.codeGeneratorForm.trialCompoundName.trim().toUpperCase();
       } catch (error) {
         this.$message.error('Please provide a valid compound name!', 6);
-        return 1;
+        return false;
       }
+      return true;
     },
     standardiseTrialCountryCode: function () {
       let initialUpperCase = (someString) => {
@@ -174,8 +175,8 @@ export default {
         this.codeGeneratorForm.trialCountryCode = undefined;
       } catch (error) {
         this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
-        return 1;
       }
+      return false;
     },
     formatTrialPhase: function (value) {
       const phaseMap = new Map();
@@ -208,8 +209,9 @@ export default {
           this.formatTrialCountryCode(trialRecord.trialCountryCode);
     },
     generateTrialCode: function () {
-      if (this.standardiseTrialCompoundName() || this.standardiseTrialCountryCode()) {
+      if (!this.standardiseTrialCompoundName() || !this.standardiseTrialCountryCode()) {
         // error occurred
+        this.$message.error('Please check your input and correct the mistakes!', 6);
         return;
       }
       this.waiting = true;
@@ -251,8 +253,9 @@ export default {
   padding: 24px;
 }
 .header {
+  font-weight: lighter;
   font-size: xx-large;
-  margin: 4px;
+  margin: 4px 4px 20px 4px;
   padding: 4px;
   text-align: center;
 }

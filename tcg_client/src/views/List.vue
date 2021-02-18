@@ -315,9 +315,9 @@ export default {
     };
   },
   computed: {
-    // userInfo: function () {
-    //   JSON.parse(localStorage.getItem('userInfo'));
-    // },
+    userInfo: function () {
+      JSON.parse(localStorage.getItem('userInfo'));
+    },
   },
   created() {
     const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -448,9 +448,12 @@ export default {
     standardiseTrialCompoundName: function () {
       try {
         this.recordEditForm.trialCompoundName = this.recordEditForm.trialCompoundName.trim().toUpperCase();
+        CONSOLE.LOG(this.recordEditForm)
       } catch (error) {
         this.$message.error('Please provide a valid compound name!', 6);
+        return false;
       }
+      return true;
     },
     standardiseTrialCountryCode: function () {
       let initialUpperCase = (someString) => {
@@ -474,6 +477,7 @@ export default {
       } catch (error) {
         this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
       }
+      return false;
     },
     handleOk(e) {
       this.modelSpec.confirmLoading = true;

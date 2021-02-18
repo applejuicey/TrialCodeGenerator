@@ -2,10 +2,10 @@ const { Sequelize } = require('sequelize');
 
 const databaseConfig = {
   databaseName: 'TCG',
-  username: 'yang.fan',
-  password: '666666',
-  host: '10.10.8.21',
-  port: '26104'
+  username: 'yangfan',
+  password: 'Fyhaoshuai23333',
+  host: '172.16.10.23',
+  port: '3306'
 };
 
 const sequelize = new Sequelize(databaseConfig.databaseName, databaseConfig.username, databaseConfig.password, {
