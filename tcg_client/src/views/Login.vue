@@ -2,7 +2,10 @@
 
     <a-row type="flex" justify="space-around" align="middle" class="login-form-wrapper">
       <a-col :lg="12" :offset-lg="6">
-        <a-card title="恒瑞研发部临床试验编号登记平台" :bordered="false">
+        <div class="my-table-wrapper">
+          <div class="my-card-header-title">
+            恒瑞研发部临床试验编号登记平台
+          </div>
           <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">
               <a-input v-model:value="loginForm.username" placeholder="Please input the username" type="text" @pressEnter="login" autofocus/>
@@ -17,7 +20,7 @@
               <a-spin v-else/>
             </a-form-item>
           </a-form>
-        </a-card>
+        </div>
       </a-col>
     </a-row>
 

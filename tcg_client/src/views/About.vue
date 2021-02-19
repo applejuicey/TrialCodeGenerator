@@ -1,8 +1,11 @@
 <template>
 
-  <a-row type="flex" justify="space-around" align="middle" class="about-form-wrapper">
+  <a-row type="flex" justify="space-around" align="middle">
     <a-col :lg="16" :offset-lg="4">
-      <a-card title="About the 'Trial Code Generator'" :bordered="false">
+      <div class="my-table-wrapper">
+        <div class="my-card-header-title">
+          About the 'Trial Code Generator'
+        </div>
         <div class="para-title">
           About Version Number (e.g. <span class="version-number">V a.b.c</span>):
         </div>
@@ -19,6 +22,12 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 3.0.1</span>
+              <ul>
+                <li>REV: Mobile-end responsive features improved.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 3.0.0</span>
               <ul>
                 <li>ADD: Value validation before submission of the form on 'Generate Page';</li>
@@ -26,6 +35,7 @@
                 <li>REV: Login status expiry time shortened from 24h to 1h;</li>
                 <li>REV: 'Trial Phase' dropdown selection choices appended;</li>
                 <li>REV: Content of 'About Page' added;</li>
+                <li>REV: Icon of the APP embellished.</li>
                 <li>REV: Icon of the APP embellished.</li>
               </ul>
             </li>
@@ -43,7 +53,7 @@
             </li>
           </ul>
         </div>
-      </a-card>
+      </div>
     </a-col>
   </a-row>
 

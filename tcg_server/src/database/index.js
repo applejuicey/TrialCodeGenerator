@@ -4,7 +4,7 @@ const databaseConfig = {
   databaseName: 'TCG',
   username: 'yangfan',
   password: 'Fyhaoshuai23333',
-  host: '172.16.10.23',
+  host: 'localhost',
   port: '3306'
 };
 

@@ -221,7 +221,7 @@ export default {
             dataIndex: 'trialCode',
             slots: { customRender: 'trialCode' },
             width: '200px',
-            fixed: 'left',
+            // fixed: 'left',
           },
           {
             title: 'Compound Name',
@@ -296,7 +296,7 @@ export default {
             title: 'Action',
             slots: { customRender: 'action' },
             width: '100px',
-            fixed: 'right',
+            // fixed: 'right',
             align: 'center',
           },
         ],
@@ -447,8 +447,10 @@ export default {
     },
     standardiseTrialCompoundName: function () {
       try {
+        if (!this.recordEditForm.trialCompoundName) {
+          throw new Error();
+        }
         this.recordEditForm.trialCompoundName = this.recordEditForm.trialCompoundName.trim().toUpperCase();
-        CONSOLE.LOG(this.recordEditForm)
       } catch (error) {
         this.$message.error('Please provide a valid compound name!', 6);
         return false;
@@ -480,6 +482,11 @@ export default {
       return false;
     },
     handleOk(e) {
+      if (!this.standardiseTrialCompoundName() || !this.standardiseTrialCountryCode()) {
+        // error occurred
+        this.$message.error('Please check your input and correct the mistakes!', 6);
+        return;
+      }
       this.modelSpec.confirmLoading = true;
       this.$axios.patch(
           '/trial/update',

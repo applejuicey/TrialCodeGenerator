@@ -38,7 +38,7 @@
         &nbsp;
       </div>
       <a-row :gutter="22">
-        <a-col :sm="24" :md="12" :xl="8">
+        <a-col :sm="24" :xl="8">
           <div class="my-table-wrapper">
             <a-form :model="queryForm" :layout="queryForm.layout" class="query-form">
               <a-form-item label="Compound Name">
@@ -53,7 +53,7 @@
             </a-form>
           </div>
         </a-col>
-        <a-col :sm="24" :md="12" :xl="16">
+        <a-col :sm="24" :xl="16">
           <div class="my-table-wrapper">
             <a-table
                 :scroll="{ x: 'max-content', y: 'max-content' }"
@@ -103,7 +103,7 @@ export default {
             title: 'Compound Name',
             dataIndex: 'trialCompoundName',
             key: 'trialCompoundName',
-            width: '60%',
+            width: '40%',
           },
           {
             title: 'Phase',

@@ -114,6 +114,8 @@ export default {
   min-height: 100vh;
   background-size:cover;
   background-repeat: no-repeat;
+  overflow-x: hidden;
+  width: 100vw;
 }
 #app-container .logo {
   width: 120px;
@@ -161,19 +163,16 @@ export default {
   border-radius: 25px;
   background-color: #ffffffde;
   padding: 30px;
+  margin-bottom: 20px;
 }
 .ant-btn {
   border-radius: 5px !important;
 }
-.ant-card-head-title {
+.my-card-header-title {
   text-transform: uppercase;
+  text-align: center;
   font-weight: lighter;
   font-size: large;
   padding: 30px 0 30px 0;
-}
-.ant-card {
-  background: #ffffffde !important;
-  border-radius: 25px !important;
-  padding: 20px !important;
 }
 </style>

@@ -147,6 +147,9 @@ export default {
   methods: {
     standardiseTrialCompoundName: function () {
       try {
+        if (!this.codeGeneratorForm.trialCompoundName) {
+          throw new Error();
+        }
         this.codeGeneratorForm.trialCompoundName = this.codeGeneratorForm.trialCompoundName.trim().toUpperCase();
       } catch (error) {
         this.$message.error('Please provide a valid compound name!', 6);
