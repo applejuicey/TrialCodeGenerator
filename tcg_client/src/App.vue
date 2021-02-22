@@ -28,7 +28,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA ©2020 -- 恒瑞研发部临床试验编号登记平台 Version 3.0.0
+        HENGRUI PHARMA ©2020 -- 恒瑞研发部临床试验编号登记平台 Version 4.0.0
       </a-layout-footer>
     </a-layout>
 
