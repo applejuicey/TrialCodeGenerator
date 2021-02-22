@@ -5,6 +5,7 @@ const databaseConfig = {
   username: 'yangfan',
   password: 'Fyhaoshuai23333',
   host: 'localhost',
+  // host: '172.16.10.23',
   port: '3306'
 };
 

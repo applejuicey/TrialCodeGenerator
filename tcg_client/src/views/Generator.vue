@@ -11,19 +11,21 @@
           <ul>
             <li>
               The '<b>Compound Name</b>' will be converted automatically to capital letters.
-              We suggest that spaces should not be included in the middle of the compound name.
+              Blank spaces should not be included in the middle of the compound name.
               This information will be used when generating the unique trial code.
             </li>
             <li>
-              An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Trial Phase</b>' dropdown selector.
+              An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Trial Phase</b>' dropdown selector.
               This information will be used when generating the unique trial code.
             </li>
             <li>
               The '<b>Date of Generation</b>' calendar dropdown selector provides the date that the record was created.
             </li>
             <li>
-              The '<b>Country Code</b>' should be an valid Alpha-3 code (e.g. <span class="ant-green">CHN</span>) or the english short name (e.g. <span class="ant-green">China</span>) of the country according to the
-              <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>.
+              The '<b>Country Code</b>' should be a string composed of valid Alpha-3 codes (e.g. <span class="ant-green">CHN</span>) or the english short name (e.g. <span class="ant-green">China</span>) of the country according to the
+              <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>, separated by commas. 'INT' or 'international' can be used to indicate international multiple-center trials. For example, 'INT, CHN, USA' is recommended for
+              an international trial which has its main site located in China and another site in American.
+              This information will be used when generating the unique trial code.
             </li>
           </ul>
         </template>
@@ -37,7 +39,8 @@
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
-            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName"/>
+            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"
+                     @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"/>
           </a-form-item>
           <a-form-item label="Trial Phase">
             <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
@@ -47,6 +50,12 @@
               <a-select-option value="p1">
                 Phase I
               </a-select-option>
+              <a-select-option value="p12">
+                Phase I/II
+              </a-select-option>
+              <a-select-option value="p13">
+                Phase I/III
+              </a-select-option>
               <a-select-option value="p2">
                 Phase II
               </a-select-option>
@@ -55,6 +64,9 @@
               </a-select-option>
               <a-select-option value="p2b">
                 Phase II b
+              </a-select-option>
+              <a-select-option value="p23">
+                Phase II/III
               </a-select-option>
               <a-select-option value="p3">
                 Phase III
@@ -68,7 +80,7 @@
               <a-select-option value="p4">
                 Phase IV
               </a-select-option>
-              <a-select-option value="NA">
+              <a-select-option value="p0NA">
                 NA
               </a-select-option>
             </a-select>
@@ -77,13 +89,18 @@
             <a-date-picker v-model:value="codeGeneratorForm.trialGenerationDate" type="date"/>
           </a-form-item>
           <a-form-item label="Country Code">
-            <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text" placeholder="Please input the 3-letter country code or country name" @blur="standardiseTrialCountryCode"/>
+            <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text" placeholder="Please input the 3-letter country code or country name"
+                     @blur="standardiseTrialCountryCode(codeGeneratorForm.trialCountryCode)"/>
           </a-form-item>
           <a-form-item :wrapper-col="wrapperColButton" class="button-container">
             <a-button type="primary" @click="generateTrialCode" v-if="!waiting">
               Generate
             </a-button>
             <a-spin v-else/>
+            |
+            <a-button @click="showExample">
+              Example
+            </a-button>
           </a-form-item>
         </a-form>
       </div>
@@ -104,7 +121,11 @@
 
 <script>
 import moment from 'moment';
-import country from 'country-list-js';
+import {
+  formatTrialCode,
+  standardiseTrialCompoundName,
+  standardiseTrialCountryCode,
+} from '../utils/formatter.js';
 import {
   SmileOutlined,
   UserOutlined,
@@ -145,75 +166,24 @@ export default {
     });
   },
   methods: {
-    standardiseTrialCompoundName: function () {
-      try {
-        if (!this.codeGeneratorForm.trialCompoundName) {
-          throw new Error();
-        }
-        this.codeGeneratorForm.trialCompoundName = this.codeGeneratorForm.trialCompoundName.trim().toUpperCase();
-      } catch (error) {
-        this.$message.error('Please provide a valid compound name!', 6);
-        return false;
-      }
-      return true;
+    showExample: function () {
+      this.codeGeneratorForm.trialCompoundName = 'SHR1210';
+      this.codeGeneratorForm.trialPhase = 'p4';
+      this.codeGeneratorForm.trialCountryCode = 'INT,CHN,USA';
     },
-    standardiseTrialCountryCode: function () {
-      let initialUpperCase = (someString) => {
-        someString = someString.toLowerCase();
-        let [initial, ...rest] = someString;
-        return initial.toUpperCase() + rest.join('');
-      };
-      try {
-        let foundCountryByISO3 = country.findByIso3(this.codeGeneratorForm.trialCountryCode.trim().toUpperCase());
-        if (foundCountryByISO3) {
-          this.codeGeneratorForm.trialCountryCode = this.codeGeneratorForm.trialCountryCode.trim().toUpperCase();
-          return true;
-        }
-        let foundCountryByName = country.findByName(initialUpperCase(this.codeGeneratorForm.trialCountryCode.trim()));
-        if (foundCountryByName) {
-          this.codeGeneratorForm.trialCountryCode = foundCountryByName.code.iso3.trim();
-          return true;
-        }
-        this.$message.error(`The country '${ this.codeGeneratorForm.trialCountryCode.trim() }' cannot be found according to ISO 3166. Please confirm your input!`, 6);
-        this.codeGeneratorForm.trialCountryCode = undefined;
-      } catch (error) {
-        this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
-      }
-      return false;
+    standardiseTrialCompoundName: function (compoundName) {
+      this.codeGeneratorForm.trialCompoundName = standardiseTrialCompoundName(compoundName).result;
     },
-    formatTrialPhase: function (value) {
-      const phaseMap = new Map();
-      phaseMap.set('p0', '0')
-          .set('p1', 'I')
-          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
-          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
-          .set('p4', 'IV')
-          .set('NA', 'NA');
-      return phaseMap.get(value);
-    },
-    formatTrialUniqueSequenceCode: function (value) {
-      let stringifiedSequenceCode = value.toString();
-      if (stringifiedSequenceCode.length === 1 ) {
-        return '0' + stringifiedSequenceCode;
-      } else {
-        return stringifiedSequenceCode;
-      }
-    },
-    formatTrialCountryCode: function (value) {
-      if (value === 'CHN') {
-        return '';
-      } else {
-        return '-' + value;
-      }
-    },
-    formatTrialCode: function (trialRecord) {
-      return trialRecord.trialCompoundName + '-' + trialRecord.trialPhase.substr(1, 1) +
-          this.formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode) +
-          this.formatTrialCountryCode(trialRecord.trialCountryCode);
+    standardiseTrialCountryCode: function (countryCode) {
+      this.codeGeneratorForm.trialCountryCode = standardiseTrialCountryCode(countryCode).result;
     },
     generateTrialCode: function () {
-      if (!this.standardiseTrialCompoundName() || !this.standardiseTrialCountryCode()) {
+      if (
+          !standardiseTrialCompoundName(this.codeGeneratorForm.trialCompoundName).status ||
+          !standardiseTrialCountryCode(this.codeGeneratorForm.trialCountryCode).status
+      ) {
         // error occurred
+        console.log(standardiseTrialCompoundName().status ,standardiseTrialCountryCode().status)
         this.$message.error('Please check your input and correct the mistakes!', 6);
         return;
       }
@@ -230,7 +200,7 @@ export default {
         this.submissionResult.status = 'success';
         this.submissionResult.title = 'Action Succeeded';
         const createdTrial = response.data.createdTrial;
-        const trialCode = this.formatTrialCode(createdTrial);
+        const trialCode = formatTrialCode(createdTrial);
         this.submissionResult.subTitle = `Your submission is successful and the unique trial code is ${ trialCode }.`;
       }).catch((error) => {
         console.log(error);

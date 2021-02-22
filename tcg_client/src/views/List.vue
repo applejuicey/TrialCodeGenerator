@@ -35,6 +35,7 @@
             </li>
             <li>
               The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
+              This information will be used when generating the unique trial code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
@@ -44,19 +45,19 @@
               function is implemented in this column.
             </li>
             <li>
-              An exhaustive list of 'I', 'II', 'III' and 'IV' is employed in the '<b>Phase</b>' column to mark the trial phase.
+              An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Phase</b>' column to mark the trial phase.
               This information will be used when generating the unique trial code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
             <li>
-              The '<b>NO.</b>' column presents the non-repeated number of a specific trial under a specific compound.
+              The '<b>NO.</b>' column presents the sequence of a specific trial per phase per compound.
               This information will be used when generating the unique trial code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
             <li>
-              The '<b>Action</b>' column provides you with the ability to edit the record in the same row.
+              The '<b>Action</b>' column enables the edition of the record in the same row.
               A modal with an edit form will be shown after clicking the '<span class="ant-blue"><EditOutlined/>Edit</span>' button.
             </li>
           </ul>
@@ -120,7 +121,8 @@
             <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
               <a-form layout="vertical" :model="recordEditForm">
                 <a-form-item label="Compound Name">
-                  <a-input v-model:value="recordEditForm.trialCompoundName" placeholder="Please input the compound name" type="text" @blur="standardiseTrialCompoundName"/>
+                  <a-input v-model:value="recordEditForm.trialCompoundName" placeholder="Please input the compound name" type="text"
+                           @blur="standardiseTrialCompoundName(recordEditForm.trialCompoundName)"/>
                 </a-form-item>
                 <a-form-item label="Trial Status" >
                   <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a trial status" :disabled="['t2'].includes(test.userType) && ['s1'].includes(recordEditForm.trialStatus)">
@@ -146,6 +148,12 @@
                     <a-select-option value="p1">
                       Phase I
                     </a-select-option>
+                    <a-select-option value="p12">
+                      Phase I/II
+                    </a-select-option>
+                    <a-select-option value="p13">
+                      Phase I/III
+                    </a-select-option>
                     <a-select-option value="p2">
                       Phase II
                     </a-select-option>
@@ -154,6 +162,9 @@
                     </a-select-option>
                     <a-select-option value="p2b">
                       Phase II b
+                    </a-select-option>
+                    <a-select-option value="p23">
+                      Phase II/III
                     </a-select-option>
                     <a-select-option value="p3">
                       Phase III
@@ -167,13 +178,14 @@
                     <a-select-option value="p4">
                       Phase IV
                     </a-select-option>
-                    <a-select-option value="NA">
+                    <a-select-option value="p0NA">
                       NA
                     </a-select-option>
                   </a-select>
                 </a-form-item>
                 <a-form-item label="Country Code">
-                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text" @blur="standardiseTrialCountryCode"/>
+                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text"
+                           @blur="standardiseTrialCountryCode(recordEditForm.trialCountryCode)"/>
                 </a-form-item>
               </a-form>
             </a-modal>
@@ -187,6 +199,12 @@
 </template>
 
 <script>
+import {
+  formatTrialCode,
+  formatTrialPhase,
+  standardiseTrialCompoundName,
+  standardiseTrialCountryCode,
+} from '../utils/formatter.js';
 import {
   SmileOutlined,
   SearchOutlined,
@@ -208,7 +226,6 @@ export default {
   data() {
     return {
       test: JSON.parse(localStorage.getItem('userInfo')),
-      trialStatusArray: [],
       queryParams: {
         results: 20,
         page: 1,
@@ -314,42 +331,6 @@ export default {
       recordEditForm: {},
     };
   },
-  computed: {
-    userInfo: function () {
-      JSON.parse(localStorage.getItem('userInfo'));
-    },
-  },
-  created() {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    if (['t0', 't1'].includes(userInfo.userType)) {
-      this.trialStatusArray = [
-        {
-          description: 'Proposed',
-          value: 's0',
-        },
-        {
-          description: 'Confirmed',
-          value: 's1',
-        },
-        {
-          description: 'Suspended',
-          value: 's2',
-        },
-      ];
-    }
-    if (['t2'].includes(userInfo.userType)) {
-      this.trialStatusArray = [
-        {
-          description: 'Proposed',
-          value: 's0',
-        },
-        {
-          description: 'Suspended',
-          value: 's2',
-        },
-      ];
-    }
-    },
   mounted() {
     this.fetch();
   },
@@ -396,8 +377,10 @@ export default {
     handleReset(clearFilters) {
       clearFilters();
     },
+    formatTrialCode: formatTrialCode,
+    formatTrialPhase: formatTrialPhase,
     editRecord: function (text, targetRecord) {
-      this.modelSpec.title = `Edit record "${ this.formatTrialCode(targetRecord) }"`;
+      this.modelSpec.title = `Edit record "${ formatTrialCode(targetRecord) }"`;
       this.modelSpec.visible = true;
       this.recordEditForm = targetRecord;
     },
@@ -415,74 +398,17 @@ export default {
     formatTrialGenerationDate: function (value) {
       return value.split('T')[0];
     },
-    formatTrialPhase: function (value) {
-      const phaseMap = new Map();
-      phaseMap.set('p0', '0')
-          .set('p1', 'I')
-          .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb')
-          .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
-          .set('p4', 'IV')
-          .set('NA', 'NA');
-      return phaseMap.get(value);
+    standardiseTrialCompoundName: function (compoundName) {
+      this.recordEditForm.trialCompoundName = standardiseTrialCompoundName(compoundName).result;
     },
-    formatTrialUniqueSequenceCode: function (value) {
-      let stringifiedSequenceCode = value.toString();
-      if (stringifiedSequenceCode.length === 1 ) {
-        return '0' + stringifiedSequenceCode;
-      } else {
-        return stringifiedSequenceCode;
-      }
-    },
-    formatTrialCountryCode: function (value) {
-      if (value === 'CHN') {
-        return '';
-      } else {
-        return '-' + value;
-      }
-    },
-    formatTrialCode: function (trialRecord) {
-      return trialRecord.trialCompoundName + '-' + trialRecord.trialPhase.substr(1, 1) +
-          this.formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode) +
-          this.formatTrialCountryCode(trialRecord.trialCountryCode);
-    },
-    standardiseTrialCompoundName: function () {
-      try {
-        if (!this.recordEditForm.trialCompoundName) {
-          throw new Error();
-        }
-        this.recordEditForm.trialCompoundName = this.recordEditForm.trialCompoundName.trim().toUpperCase();
-      } catch (error) {
-        this.$message.error('Please provide a valid compound name!', 6);
-        return false;
-      }
-      return true;
-    },
-    standardiseTrialCountryCode: function () {
-      let initialUpperCase = (someString) => {
-        someString = someString.toLowerCase();
-        let [initial, ...rest] = someString;
-        return initial.toUpperCase() + rest.join('');
-      };
-      try {
-        let foundCountryByISO3 = country.findByIso3(this.recordEditForm.trialCountryCode.trim().toUpperCase());
-        if (foundCountryByISO3) {
-          this.recordEditForm.trialCountryCode = this.recordEditForm.trialCountryCode.trim().toUpperCase();
-          return true;
-        }
-        let foundCountryByName = country.findByName(initialUpperCase(this.recordEditForm.trialCountryCode.trim()));
-        if (foundCountryByName) {
-          this.recordEditForm.trialCountryCode = foundCountryByName.code.iso3.trim();
-          return true;
-        }
-        this.$message.error(`The country '${ this.recordEditForm.trialCountryCode.trim() }' cannot be found according to ISO 3166. Please confirm your input!`, 6);
-        this.recordEditForm.trialCountryCode = undefined;
-      } catch (error) {
-        this.$message.error('Please provide a valid 3-letter country code or country name according to the ISO-3166!', 6);
-      }
-      return false;
+    standardiseTrialCountryCode: function (countryCode) {
+      this.recordEditForm.trialCountryCode = standardiseTrialCountryCode(countryCode).result;
     },
     handleOk(e) {
-      if (!this.standardiseTrialCompoundName() || !this.standardiseTrialCountryCode()) {
+      if (
+          !standardiseTrialCompoundName(this.recordEditForm.trialCompoundName).status ||
+          !standardiseTrialCountryCode(this.recordEditForm.trialCountryCode).status
+      ) {
         // error occurred
         this.$message.error('Please check your input and correct the mistakes!', 6);
         return;

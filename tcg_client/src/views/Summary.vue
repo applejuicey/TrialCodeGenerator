@@ -16,7 +16,7 @@
               <code class="ant-green">SHR1210, SHR3680</code>&nbsp;
               <CopyOutlined class="ant-blue" @click="copyToClipBoard('SHR1210, SHR3680')"/>
               <br>
-              If you want to draw a comprehensive summary list of all compounds, you can input as follows:
+              If you want a summary of all compounds, you can input as follows:
               <br>
               <code class="ant-green">ALL</code>&nbsp;
               <CopyOutlined class="ant-blue" @click="copyToClipBoard('ALL')"/>&nbsp;
@@ -38,7 +38,7 @@
         &nbsp;
       </div>
       <a-row :gutter="22">
-        <a-col :sm="24" :xl="8">
+        <a-col :xl="8">
           <div class="my-table-wrapper">
             <a-form :model="queryForm" :layout="queryForm.layout" class="query-form">
               <a-form-item label="Compound Name">
@@ -53,7 +53,7 @@
             </a-form>
           </div>
         </a-col>
-        <a-col :sm="24" :xl="16">
+        <a-col :xl="16">
           <div class="my-table-wrapper">
             <a-table
                 :scroll="{ x: 'max-content', y: 'max-content' }"
@@ -82,6 +82,7 @@ import {
   CopyOutlined,
   DownCircleOutlined,
 } from "@ant-design/icons-vue";
+import {formatTrialPhase} from "@/utils/formatter";
 export default {
   components: {
     SmileOutlined,
@@ -153,16 +154,16 @@ export default {
       rawSummaryResults.forEach((rawRecord) => {
         if (!uniqueCompoundNames.includes(rawRecord.trialCompoundName)) {
           uniqueCompoundNames.push(rawRecord.trialCompoundName);
-          // 分别对应0 1 2 3 4 NA共6种
-          counterMatrix.push([0, 0, 0, 0, 0, 0]);
+          // 分别对应0 1 2 3 4共5种
+          counterMatrix.push([0, 0, 0, 0, 0]);
         }
       })
       rawSummaryResults.forEach((rawRecord) => {
-        if (rawRecord.trialPhase.substr(1, 1) === 'A') {
-          counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][5] ++;
-        } else {
+        // if (rawRecord.trialPhase.substr(1, 1) === 'A') {
+        //   counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][5] ++;
+        // } else {
           counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
-        }
+        // }
       })
       let parsedSummaryResults = [];
       for (const name of uniqueCompoundNames) {
@@ -174,7 +175,7 @@ export default {
           }),
           children: (function () {
             let result = [];
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 5; i++) {
               result.push({
                 key: uniqueCompoundNames.indexOf(name) + '' + i,
                 trialPhase: 'p' + i,
@@ -187,16 +188,7 @@ export default {
       }
       return parsedSummaryResults;
     },
-    formatTrialPhase: function (value) {
-      const phaseMap = new Map();
-      phaseMap.set('p0', '0')
-          .set('p1', 'I')
-          .set('p2', 'II')
-          .set('p3', 'III')
-          .set('p4', 'IV')
-          .set('p5', 'NA');
-      return phaseMap.get(value);
-    },
+    formatTrialPhase: formatTrialPhase,
     copyToClipBoard: function (text) {
       let transfer = document.createElement('input');
       document.body.appendChild(transfer);

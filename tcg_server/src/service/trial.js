@@ -16,9 +16,12 @@ const createOneTrial = async function(newTrial) {
         'trialUniqueSequenceCode',
         {
           where: {
-            trialCompoundName: {
-              [Op.eq]: parsedNewTrial.trialCompoundName,
-            },
+            [Op.and]: [
+              { trialCompoundName: parsedNewTrial.trialCompoundName },
+              { trialPhase: {
+                  [Op.startsWith]: 'p' + parsedNewTrial.trialPhase.substr(1,1),
+                } }
+            ],
           },
         },
       );

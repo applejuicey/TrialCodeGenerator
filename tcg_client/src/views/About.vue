@@ -22,6 +22,15 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 4.0.0</span>
+              <ul>
+                <li>REV: 'Trial Phase' dropdown selection choices appended;</li>
+                <li>REV: Sequence number algorithm revised.</li>
+                <li>REV: International trials can be marked by 'INT' in 'Country'.</li>
+                <li>REV: Mobile-end responsive features improved.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 3.0.1</span>
               <ul>
                 <li>REV: Mobile-end responsive features improved.</li>
