@@ -11,21 +11,20 @@
           <ul>
             <li>
               The '<b>Compound Name</b>' will be converted automatically to capital letters.
-              Blank spaces should not be included in the middle of the compound name.
+              Blank spaces should <b>NOT</b> be included in the middle of the compound name.
               This information will be used when generating the unique trial code.
             </li>
             <li>
               An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Trial Phase</b>' dropdown selector.
-              This information will be used when generating the unique trial code.
+              This information will be used when generating the unique trial code. <b>Please pay particular attention to the correctness of this filed.</b>
             </li>
             <li>
               The '<b>Date of Generation</b>' calendar dropdown selector provides the date that the record was created.
             </li>
             <li>
               The '<b>Country Code</b>' should be a string composed of valid Alpha-3 codes (e.g. <span class="ant-green">CHN</span>) or the english short name (e.g. <span class="ant-green">China</span>) of the country according to the
-              <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>, separated by commas. 'INT' or 'international' can be used to indicate international multiple-center trials. For example, 'INT, CHN, USA' is recommended for
-              an international trial which has its main site located in China and another site in American.
-              This information will be used when generating the unique trial code.
+              <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>, separated by commas. For example, 'CHN, USA' is recommended for
+              a multi-centre international trial which has its main site located in China and another site in the USA.
             </li>
           </ul>
         </template>
@@ -35,7 +34,7 @@
       </div>
       <div class="generatorForm" v-if="!submitted">
         <div class="header">
-          <span>恒瑞研发部临床试验编号登记平台</span>
+          <span>Clinical Trial Number Registration Platform</span>
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
@@ -50,10 +49,10 @@
               <a-select-option value="p1">
                 Phase I
               </a-select-option>
-              <a-select-option value="p12">
+              <a-select-option value="p21">
                 Phase I/II
               </a-select-option>
-              <a-select-option value="p13">
+              <a-select-option value="p31">
                 Phase I/III
               </a-select-option>
               <a-select-option value="p2">
@@ -65,7 +64,7 @@
               <a-select-option value="p2b">
                 Phase II b
               </a-select-option>
-              <a-select-option value="p23">
+              <a-select-option value="p32">
                 Phase II/III
               </a-select-option>
               <a-select-option value="p3">
@@ -89,7 +88,7 @@
             <a-date-picker v-model:value="codeGeneratorForm.trialGenerationDate" type="date"/>
           </a-form-item>
           <a-form-item label="Country Code">
-            <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text" placeholder="Please input the 3-letter country code or country name"
+            <a-input v-model:value="codeGeneratorForm.trialCountryCode" type="text" placeholder="Please input the 3-letter country code or country name, separated by commas"
                      @blur="standardiseTrialCountryCode(codeGeneratorForm.trialCountryCode)"/>
           </a-form-item>
           <a-form-item :wrapper-col="wrapperColButton" class="button-container">
@@ -98,7 +97,7 @@
             </a-button>
             <a-spin v-else/>
             |
-            <a-button @click="showExample">
+            <a-button type="primary" @click="showExample">
               Example
             </a-button>
           </a-form-item>
@@ -168,8 +167,8 @@ export default {
   methods: {
     showExample: function () {
       this.codeGeneratorForm.trialCompoundName = 'SHR1210';
-      this.codeGeneratorForm.trialPhase = 'p4';
-      this.codeGeneratorForm.trialCountryCode = 'INT,CHN,USA';
+      this.codeGeneratorForm.trialPhase = 'p1';
+      this.codeGeneratorForm.trialCountryCode = 'CHN,USA';
     },
     standardiseTrialCompoundName: function (compoundName) {
       this.codeGeneratorForm.trialCompoundName = standardiseTrialCompoundName(compoundName).result;

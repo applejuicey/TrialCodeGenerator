@@ -11,8 +11,8 @@
         </div>
         <div class="para-body">
           <ul>
-            <li>Increment position '<span class="version-number">a</span>' when database schema has been changed;</li>
-            <li>Increment position '<span class="version-number">b</span>' when database schema has not been changed and major revision has been made;</li>
+            <li>Increment position '<span class="version-number">a</span>' when database schema has been changed.</li>
+            <li>Increment position '<span class="version-number">b</span>' when database schema has not been changed and major revision has been made.</li>
             <li>Increment position '<span class="version-number">c</span>' when database schema has not been changed and minor revision has been made.</li>
           </ul>
         </div>
@@ -22,42 +22,53 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 4.1.0</span>
+              <ul>
+                <li>REV: 'Trial Phase' matching codes are revised.</li>
+                <li>REV: Country suffix is now removed from the generated trial code.</li>
+                <li>
+                  REV: International trials no longer need to be marked by 'INT' in the 'Country' field.
+                  They can be identified automatically if there are more than one country in the 'Country' field.
+                </li>
+                <li>REV: APP name translation is added.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 4.0.0</span>
               <ul>
-                <li>REV: 'Trial Phase' dropdown selection choices appended;</li>
-                <li>REV: Sequence number algorithm revised.</li>
-                <li>REV: International trials can be marked by 'INT' in 'Country'.</li>
-                <li>REV: Mobile-end responsive features improved.</li>
+                <li>REV: New 'Trial Phase' dropdown selection choices are appended.</li>
+                <li>REV: The sequence number algorithm is revised.</li>
+                <li>REV: International multi-centre trials now can be marked by 'INT' in the 'Country' field.</li>
+                <li>REV: Mobile-end responsive features are improved.</li>
               </ul>
             </li>
             <li>
               <span class="version-number">V 3.0.1</span>
               <ul>
-                <li>REV: Mobile-end responsive features improved.</li>
+                <li>REV: Mobile-end responsive features are improved.</li>
               </ul>
             </li>
             <li>
               <span class="version-number">V 3.0.0</span>
               <ul>
-                <li>ADD: Value validation before submission of the form on 'Generate Page';</li>
-                <li>REV: Content of 'Instruction' on 'Control Panel Page';</li>
-                <li>REV: Login status expiry time shortened from 24h to 1h;</li>
-                <li>REV: 'Trial Phase' dropdown selection choices appended;</li>
-                <li>REV: Content of 'About Page' added;</li>
-                <li>REV: Icon of the APP embellished.</li>
-                <li>REV: Icon of the APP embellished.</li>
+                <li>ADD: Form validation before submission on 'Generate Page' is added.</li>
+                <li>REV: Content of 'Instruction' on 'Control Panel Page' is revised.</li>
+                <li>REV: Login status expiry time is shortened from 24h to 1h.</li>
+                <li>REV: New 'Trial Phase' dropdown selection choices are appended.</li>
+                <li>REV: A new 'About Page' is added.</li>
+                <li>REV: Icon of the APP is embellished.</li>
               </ul>
             </li>
             <li>
               <span class="version-number">V 2.0.0</span>
               <ul>
-                <li>ADD: Login module added.</li>
+                <li>ADD: A login module is added.</li>
               </ul>
             </li>
             <li>
               <span class="version-number">V 1.0.0</span>
               <ul>
-                <li>Initial Version Deployed.</li>
+                <li>Initial Deployment</li>
               </ul>
             </li>
           </ul>
@@ -82,9 +93,6 @@ export default {
 </script>
 
 <style scoped>
-.about-form-wrapper {
-  text-align: center;
-}
 .para-title {
   text-align: left;
   font-size: medium;
@@ -95,8 +103,5 @@ export default {
 .version-number {
   font-weight: bold;
   color: #ff5500;
-}
-.button-container {
-  margin-bottom: 0;
 }
 </style>

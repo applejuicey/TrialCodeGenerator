@@ -82,7 +82,7 @@ import {
   CopyOutlined,
   DownCircleOutlined,
 } from "@ant-design/icons-vue";
-import {formatTrialPhase} from "@/utils/formatter";
+import { formatTrialPhase } from "@/utils/formatter";
 export default {
   components: {
     SmileOutlined,
@@ -159,11 +159,7 @@ export default {
         }
       })
       rawSummaryResults.forEach((rawRecord) => {
-        // if (rawRecord.trialPhase.substr(1, 1) === 'A') {
-        //   counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][5] ++;
-        // } else {
-          counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
-        // }
+        counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
       })
       let parsedSummaryResults = [];
       for (const name of uniqueCompoundNames) {

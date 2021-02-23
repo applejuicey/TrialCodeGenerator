@@ -4,7 +4,9 @@
       <a-col :lg="12" :offset-lg="6">
         <div class="my-table-wrapper">
           <div class="my-card-header-title">
-            恒瑞研发部临床试验编号登记平台
+            Hengrui Department of R.&D.
+            <br>
+            Clinical Trial Number Registration Platform
           </div>
           <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">

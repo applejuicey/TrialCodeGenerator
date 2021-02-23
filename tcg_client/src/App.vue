@@ -3,7 +3,7 @@
 
     <a-layout id="app-container" :style="backgroundImageStyle">
       <a-layout-header class="header" v-if="!onLoginPage">
-        <div class="logo"/>
+        <a class="logo" href="https://www.hrs.com.cn/index.html"/>
         <a-menu theme="dark" mode="horizontal" v-model:selectedKeys="menuSelectedKeys" class="menu">
           <a-menu-item key="1" @click="pushRoute('trial-list')">
             <ToolOutlined/>Control Panel
@@ -28,7 +28,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA ©2020 -- 恒瑞研发部临床试验编号登记平台 Version 4.0.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Number Registration Platform Version 4.1.0
       </a-layout-footer>
     </a-layout>
 

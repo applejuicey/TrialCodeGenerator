@@ -34,8 +34,7 @@
               A description of change of trial status or other important information is listed in the '<b>Status Description</b>' column.
             </li>
             <li>
-              The country code which will be appended to the unique trial code is listed in the '<b>Country</b>' column.
-              This information will be used when generating the unique trial code.
+              The country code which is composed of valid Alpha-3 codes concatenated with commas is listed in the '<b>Country</b>' column.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
@@ -140,49 +139,6 @@
                 <a-form-item label="Status Description" placeholder="Please fill in the reason for trial status change">
                   <a-textarea v-model:value="recordEditForm.trialStatusDescription" />
                 </a-form-item>
-                <a-form-item label="Trial Phase">
-                  <a-select v-model:value="recordEditForm.trialPhase" placeholder="Please select a trial phase">
-                    <a-select-option value="p0">
-                      Phase 0
-                    </a-select-option>
-                    <a-select-option value="p1">
-                      Phase I
-                    </a-select-option>
-                    <a-select-option value="p12">
-                      Phase I/II
-                    </a-select-option>
-                    <a-select-option value="p13">
-                      Phase I/III
-                    </a-select-option>
-                    <a-select-option value="p2">
-                      Phase II
-                    </a-select-option>
-                    <a-select-option value="p2a">
-                      Phase II a
-                    </a-select-option>
-                    <a-select-option value="p2b">
-                      Phase II b
-                    </a-select-option>
-                    <a-select-option value="p23">
-                      Phase II/III
-                    </a-select-option>
-                    <a-select-option value="p3">
-                      Phase III
-                    </a-select-option>
-                    <a-select-option value="p3a">
-                      Phase III a
-                    </a-select-option>
-                    <a-select-option value="p3b">
-                      Phase III b
-                    </a-select-option>
-                    <a-select-option value="p4">
-                      Phase IV
-                    </a-select-option>
-                    <a-select-option value="p0NA">
-                      NA
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
                 <a-form-item label="Country Code">
                   <a-input v-model:value="recordEditForm.trialCountryCode" type="text"
                            @blur="standardiseTrialCountryCode(recordEditForm.trialCountryCode)"/>
@@ -213,7 +169,6 @@ import {
   SortDescendingOutlined,
   FilterOutlined,
 } from '@ant-design/icons-vue';
-import country from "country-list-js";
 export default {
   components: {
     SmileOutlined,
@@ -377,32 +332,10 @@ export default {
     handleReset(clearFilters) {
       clearFilters();
     },
-    formatTrialCode: formatTrialCode,
-    formatTrialPhase: formatTrialPhase,
     editRecord: function (text, targetRecord) {
       this.modelSpec.title = `Edit record "${ formatTrialCode(targetRecord) }"`;
       this.modelSpec.visible = true;
       this.recordEditForm = targetRecord;
-    },
-    formatTrialStatus: function (value) {
-      const statusMap = new Map();
-      statusMap.set('s0', ['Proposed', 'processing', '#108ee9'])
-          .set('s1', ['Confirmed', 'success', '#87d068'])
-          .set('s2', ['Suspended', 'error', '#f50']);
-      return {
-        text: statusMap.get(value)[0],
-        status: statusMap.get(value)[1],
-        color: statusMap.get(value)[2],
-      };
-    },
-    formatTrialGenerationDate: function (value) {
-      return value.split('T')[0];
-    },
-    standardiseTrialCompoundName: function (compoundName) {
-      this.recordEditForm.trialCompoundName = standardiseTrialCompoundName(compoundName).result;
-    },
-    standardiseTrialCountryCode: function (countryCode) {
-      this.recordEditForm.trialCountryCode = standardiseTrialCountryCode(countryCode).result;
     },
     handleOk(e) {
       if (
@@ -438,10 +371,28 @@ export default {
         this.modelSpec.confirmLoading = false;
       });
     },
+    formatTrialCode: formatTrialCode,
+    formatTrialPhase: formatTrialPhase,
+    formatTrialStatus: function (value) {
+      const statusMap = new Map();
+      statusMap.set('s0', ['Proposed', 'processing', '#108ee9'])
+          .set('s1', ['Confirmed', 'success', '#87d068'])
+          .set('s2', ['Suspended', 'error', '#f50']);
+      return {
+        text: statusMap.get(value)[0],
+        status: statusMap.get(value)[1],
+        color: statusMap.get(value)[2],
+      };
+    },
+    formatTrialGenerationDate: function (value) {
+      return value.split('T')[0];
+    },
+    standardiseTrialCompoundName: function (compoundName) {
+      this.recordEditForm.trialCompoundName = standardiseTrialCompoundName(compoundName).result;
+    },
+    standardiseTrialCountryCode: function (countryCode) {
+      this.recordEditForm.trialCountryCode = standardiseTrialCountryCode(countryCode).result;
+    },
   },
 }
 </script>
-
-<style scoped>
-
-</style>
