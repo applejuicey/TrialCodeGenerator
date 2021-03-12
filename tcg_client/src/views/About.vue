@@ -4,7 +4,7 @@
     <a-col :lg="16" :offset-lg="4">
       <div class="my-table-wrapper">
         <div class="my-card-header-title">
-          About the 'Trial Code Generator'
+          the 'Clinical Trial Protocol Number Registration Platform'
         </div>
         <div class="para-title">
           About Version Number (e.g. <span class="version-number">V a.b.c</span>):
@@ -22,6 +22,15 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 4.2.0</span>
+              <ul>
+                <li>ADD: 'International Indicator Column' is added on 'Summary Table'.</li>
+                <li>ADD: CSV export functions are added on the 'Summary' page.</li>
+                <li>ADD: Compound name validation base on a name pool is added.</li>
+                <li>ADD: External data can now be imported.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 4.1.0</span>
               <ul>
                 <li>REV: 'Trial Phase' matching codes are revised.</li>
@@ -30,7 +39,7 @@
                   REV: International trials no longer need to be marked by 'INT' in the 'Country' field.
                   They can be identified automatically if there are more than one country in the 'Country' field.
                 </li>
-                <li>REV: APP name translation is added.</li>
+                <li>ADD: APP name translation is added.</li>
               </ul>
             </li>
             <li>

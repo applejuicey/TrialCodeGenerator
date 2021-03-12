@@ -16,7 +16,7 @@
             </li>
             <li>
               An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Trial Phase</b>' dropdown selector.
-              This information will be used when generating the unique trial code. <b>Please pay particular attention to the correctness of this filed.</b>
+              This information will be used when generating the unique trial code. <b>Please pay particular attention to the correctness of this field.</b>
             </li>
             <li>
               The '<b>Date of Generation</b>' calendar dropdown selector provides the date that the record was created.
@@ -34,7 +34,7 @@
       </div>
       <div class="generatorForm" v-if="!submitted">
         <div class="header">
-          <span>Clinical Trial Number Registration Platform</span>
+          <span>Clinical Trial Protocol Number Registration Platform</span>
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
@@ -93,12 +93,12 @@
           </a-form-item>
           <a-form-item :wrapper-col="wrapperColButton" class="button-container">
             <a-button type="primary" @click="generateTrialCode" v-if="!waiting">
-              Generate
+              <CheckCircleOutlined />Generate
             </a-button>
             <a-spin v-else/>
-            |
+            <span>&nbsp;</span>
             <a-button type="primary" @click="showExample">
-              Example
+              <InfoCircleOutlined />Example
             </a-button>
           </a-form-item>
         </a-form>
@@ -130,6 +130,8 @@ import {
   UserOutlined,
   LaptopOutlined,
   NotificationOutlined,
+  CheckCircleOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons-vue';
 export default {
   components: {
@@ -137,6 +139,8 @@ export default {
     UserOutlined,
     LaptopOutlined,
     NotificationOutlined,
+    CheckCircleOutlined,
+    InfoCircleOutlined,
   },
   data () {
     return {
@@ -194,8 +198,6 @@ export default {
           },
       ).then((response) => {
         console.log(response);
-        this.waiting = false;
-        this.submitted = true;
         this.submissionResult.status = 'success';
         this.submissionResult.title = 'Action Succeeded';
         const createdTrial = response.data.createdTrial;
@@ -203,11 +205,12 @@ export default {
         this.submissionResult.subTitle = `Your submission is successful and the unique trial code is ${ trialCode }.`;
       }).catch((error) => {
         console.log(error);
-        this.waiting = false;
-        this.submitted = true;
         this.submissionResult.status = 'error';
         this.submissionResult.title = 'Action Failed';
         this.submissionResult.subTitle = `Your submission failed, detailed error is listed as follows: ${ error }.`;
+      }).finally(() => {
+        this.waiting = false;
+        this.submitted = true;
       });
     },
     pushRoute: function (routeName) {

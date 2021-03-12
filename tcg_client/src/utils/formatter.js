@@ -4,8 +4,8 @@ import country from "country-list-js";
 const formatTrialPhase = function (value) {
   const phaseMap = new Map();
   phaseMap.set('p0', '0')
-    .set('p1', 'I').set('p12', 'I/II').set('p13', 'I/III')
-    .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb').set('p23', 'II/III')
+    .set('p1', 'I').set('p21', 'I/II').set('p31', 'I/III')
+    .set('p2', 'II').set('p2a', 'IIa').set('p2b', 'IIb').set('p32', 'II/III')
     .set('p3', 'III').set('p3a', 'IIIa').set('p3b', 'IIIb')
     .set('p4', 'IV')
     .set('p0na', 'NA');
@@ -21,19 +21,9 @@ const formatTrialUniqueSequenceCode = function (value) {
   }
 }
 
-const formatTrialCountryCode = function (value) {
-  value = value.split(',')[0];
-  if (value === 'CHN') {
-    return '';
-  } else {
-    return '-' + value;
-  }
-}
-
 const formatTrialCode = function (trialRecord) {
   return trialRecord.trialCompoundName + '-' + trialRecord.trialPhase.substr(1, 1) +
-    formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode) +
-    formatTrialCountryCode(trialRecord.trialCountryCode);
+    formatTrialUniqueSequenceCode(trialRecord.trialUniqueSequenceCode);
 }
 
 const standardiseTrialCompoundName = function (name) {

@@ -46,9 +46,13 @@
               </a-form-item>
               <a-form-item :wrapper-col="queryForm.wrapperColButton" class="button-container">
                 <a-button type="primary" @click="submitQuery" v-if="!queryForm.waiting">
-                  Submit
+                  <CheckCircleOutlined />Submit
                 </a-button>
                 <a-spin v-else/>
+                <span>&nbsp;</span>
+                <a-button type="primary" @click="exportCSV" v-if="queryForm.submitted">
+                  <DownloadOutlined />Export CSV
+                </a-button>
               </a-form-item>
             </a-form>
           </div>
@@ -62,6 +66,7 @@
                 :data-source="tableSpec.data"
                 :pagination="tableSpec.pagination"
                 :loading="tableSpec.loading"
+                bordered
             >
               <template v-slot:trialPhase="{ text }">
                 <span>{{ formatTrialPhase(text) }}</span>
@@ -81,6 +86,8 @@ import {
   PlusSquareOutlined,
   CopyOutlined,
   DownCircleOutlined,
+  CheckCircleOutlined,
+  DownloadOutlined,
 } from "@ant-design/icons-vue";
 import { formatTrialPhase } from "@/utils/formatter";
 export default {
@@ -89,6 +96,8 @@ export default {
     PlusSquareOutlined,
     CopyOutlined,
     DownCircleOutlined,
+    CheckCircleOutlined,
+    DownloadOutlined,
   },
   data() {
     return {
@@ -97,6 +106,7 @@ export default {
         queryExpression: '',
         wrapperColButton: { span: 24 },
         waiting: false,
+        submitted: false,
       },
       tableSpec: {
         columns: [
@@ -104,19 +114,28 @@ export default {
             title: 'Compound Name',
             dataIndex: 'trialCompoundName',
             key: 'trialCompoundName',
-            width: '40%',
+            width: '200px',
           },
           {
             title: 'Phase',
             dataIndex: 'trialPhase',
             key: 'trialPhase',
             slots: { customRender: 'trialPhase' },
+            width: '100px',
           },
           {
             title: 'Count',
             dataIndex: 'count',
             key: 'count',
             slots: { customRender: 'count' },
+            width: '100px',
+          },
+          {
+            title: 'Global',
+            dataIndex: 'international',
+            key: 'international',
+            slots: { customRender: 'international' },
+            width: '150px',
           },
         ],
         data: [],
@@ -128,6 +147,7 @@ export default {
   methods: {
     submitQuery: function () {
       this.tableSpec.loading = true;
+      this.queryForm.waiting = true;
       let compoundNames = this.queryForm.queryExpression.split(',');
       compoundNames = compoundNames.map((name) => {
         return name.trim();
@@ -140,26 +160,33 @@ export default {
             },
           },
       ).then((response) => {
-        this.parseSummaryResults(response.data.queryResults);
+        // this.parseSummaryResults(response.data.queryResults);
         this.tableSpec.data = this.parseSummaryResults(response.data.queryResults);
-        this.tableSpec.loading = false;
       }).catch((error) => {
         console.log(error);
+      }).finally(() => {
+        this.queryForm.waiting = false;
         this.tableSpec.loading = false;
+        this.queryForm.submitted = true;
       });
     },
     parseSummaryResults: function (rawSummaryResults) {
       let uniqueCompoundNames = [];
       let counterMatrix = [];
+      let internationalMatrix = [];
       rawSummaryResults.forEach((rawRecord) => {
         if (!uniqueCompoundNames.includes(rawRecord.trialCompoundName)) {
           uniqueCompoundNames.push(rawRecord.trialCompoundName);
           // 分别对应0 1 2 3 4共5种
           counterMatrix.push([0, 0, 0, 0, 0]);
+          internationalMatrix.push([0, 0, 0, 0, 0]);
         }
       })
       rawSummaryResults.forEach((rawRecord) => {
         counterMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
+        if (rawRecord.trialCountryCode.split(',').length > 1) {
+          internationalMatrix[uniqueCompoundNames.indexOf(rawRecord.trialCompoundName)][rawRecord.trialPhase.substr(1, 1)] ++;
+        }
       })
       let parsedSummaryResults = [];
       for (const name of uniqueCompoundNames) {
@@ -169,6 +196,9 @@ export default {
           count: counterMatrix[uniqueCompoundNames.indexOf(name)].reduce((last, current) =>{
             return last + current;
           }),
+          international: internationalMatrix[uniqueCompoundNames.indexOf(name)].reduce((last, current) =>{
+            return last + current;
+          }),
           children: (function () {
             let result = [];
             for (let i = 0; i < 5; i++) {
@@ -176,12 +206,14 @@ export default {
                 key: uniqueCompoundNames.indexOf(name) + '' + i,
                 trialPhase: 'p' + i,
                 count: counterMatrix[uniqueCompoundNames.indexOf(name)][i],
+                international: internationalMatrix[uniqueCompoundNames.indexOf(name)][i],
               });
             }
             return result;
           })(),
         });
       }
+      console.log(parsedSummaryResults)
       return parsedSummaryResults;
     },
     formatTrialPhase: formatTrialPhase,
@@ -199,6 +231,24 @@ export default {
     setTextareaValue: function (text) {
       this.queryForm.queryExpression = text;
       this.$message.success(`The value of the text area has been set as '${ text }'!`);
+    },
+    exportCSV: function () {
+      let csvHeader = 'data:text/csv;charset=utf-8,';
+      let nameRow = 'Compound Name, Phase, Count, Global\n';
+      let csvContent = csvHeader + nameRow;
+      for (let compound in this.tableSpec.data) {
+        let currentArr = [compound.trialCompoundName, undefined, compound.count, compound.international];
+        let currentStr = currentArr.join(',') + '\n';
+
+        csvContent = csvContent + currentStr;
+        console.log(csvContent)
+      }
+      let encodedUri = encodeURI(csvContent);
+      let link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', 'trial_summary.csv');
+      document.body.appendChild(link);
+      link.click();
     },
   },
 }
