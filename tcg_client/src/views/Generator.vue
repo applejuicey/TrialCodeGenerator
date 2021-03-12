@@ -38,8 +38,16 @@
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
-            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"
-                     @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"/>
+<!--            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"-->
+<!--                     @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"/>-->
+<!--            @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"-->
+<!--            v-model:value="codeGeneratorForm.trialCompoundName"-->
+            <a-auto-complete
+
+                placeholder="Please input the compound name" type="text"
+                @search="onSearch"
+                :data-source="compoundPool"
+            />
           </a-form-item>
           <a-form-item label="Trial Phase">
             <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
@@ -160,6 +168,7 @@ export default {
         title: 'Internal Error',
         subTitle: 'It seems that an internal error has happened...',
       },
+      compoundPool: ['SHR3680', 'SHR1210', 'TEST666'],
     };
   },
   mounted() {
@@ -169,6 +178,13 @@ export default {
     });
   },
   methods: {
+    onSearch: function (text) {
+      this.compoundPool = this.compoundPool.filter(
+          (item) => {
+            return item.includes(text) || item.includes(text.toUpperCase());
+          }
+      );
+    },
     showExample: function () {
       this.codeGeneratorForm.trialCompoundName = 'SHR1210';
       this.codeGeneratorForm.trialPhase = 'p1';

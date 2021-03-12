@@ -160,7 +160,6 @@ export default {
             },
           },
       ).then((response) => {
-        // this.parseSummaryResults(response.data.queryResults);
         this.tableSpec.data = this.parseSummaryResults(response.data.queryResults);
       }).catch((error) => {
         console.log(error);
@@ -213,7 +212,6 @@ export default {
           })(),
         });
       }
-      console.log(parsedSummaryResults)
       return parsedSummaryResults;
     },
     formatTrialPhase: formatTrialPhase,
@@ -236,12 +234,15 @@ export default {
       let csvHeader = 'data:text/csv;charset=utf-8,';
       let nameRow = 'Compound Name, Phase, Count, Global\n';
       let csvContent = csvHeader + nameRow;
-      for (let compound in this.tableSpec.data) {
+      for (let compound of this.tableSpec.data) {
         let currentArr = [compound.trialCompoundName, undefined, compound.count, compound.international];
         let currentStr = currentArr.join(',') + '\n';
-
         csvContent = csvContent + currentStr;
-        console.log(csvContent)
+        for (let phase of compound.children) {
+          let currentArr = [undefined, phase.trialPhase, phase.count, phase.international];
+          let currentStr = currentArr.join(',') + '\n';
+          csvContent = csvContent + currentStr;
+        }
       }
       let encodedUri = encodeURI(csvContent);
       let link = document.createElement('a');
