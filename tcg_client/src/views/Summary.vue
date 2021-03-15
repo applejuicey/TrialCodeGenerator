@@ -28,8 +28,12 @@
             <li>
               Hit targets will be shown in the table on the right side (sometimes the summary table may fall under the input text area).
               A total count of all '<span class="ant-green">Confirmed</span>' trials of a specific compound will be placed in the '<b>Count</b>' column.
+              A total count of all '<span class="ant-green">Confirmed</span>' international multi-centre trials of a specific compound will be placed in the '<b>Global</b>' column.
               A more detailed presentation of trial phase distribution of the compound can be achieved by clicking the
               '<span class="ant-blue"><PlusSquareOutlined/>Inspect</span>' icon.
+            </li>
+            <li>
+              After the query, an '<span class="ant-blue">Export</span>' button can be seen, on which when clicked a CSV summary file will be downloaded.
             </li>
           </ol>
         </template>

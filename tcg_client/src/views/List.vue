@@ -6,19 +6,19 @@
         <template v-slot:icon><smile-outlined/></template>
         <template v-slot:description>
           <p>
-            On this page, you can have a good command of all trials stored in the database.
+            On this page, you can view and edit any trial in the database.
           </p>
           <ul>
             <li>
               All records will be loaded from the server automatically upon mounting of this page.
-              Any successful change on the record will trigger a data refreshing.
+              Any successful change on the record will trigger a page refreshing.
             </li>
             <li>
-              The unique trial code is listed in the '<b>Trial Code</b>' column.
+              The unique trial protocol code is listed in the '<b>Protocol Code</b>' column.
             </li>
             <li>
               The compound name is listed in the '<b>Compound Name</b>' column.
-              This information will be used when generating the unique trial code.
+              This information will be used when generating the unique trial protocol code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>' and '<span class="ant-blue"><SearchOutlined/>Searching</span>'
               functions are implemented in the '<b>Compound Name</b>' column.
               You can input a compound name in the popup box after clicking the '<span class="ant-blue"><SearchOutlined/>Searching</span>' icon to execute a more accurate search.
@@ -45,13 +45,13 @@
             </li>
             <li>
               An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Phase</b>' column to mark the trial phase.
-              This information will be used when generating the unique trial code.
+              This information will be used when generating the unique trial protocol code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
             <li>
               The '<b>NO.</b>' column presents the sequence of a specific trial per phase per compound.
-              This information will be used when generating the unique trial code.
+              This information will be used when generating the unique trial protocol code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
             </li>
@@ -81,16 +81,20 @@
           </template>
           <template v-slot:filterDropdown="{ setSelectedKeys, selectedKeys, clearFilters, column }">
             <div style="padding: 8px">
-              <a-input :placeholder="'Compound Name'" :value="selectedKeys[0]"
-                       style="width: 188px; margin-bottom: 8px; display: block;"
-                       @change="e => setSelectedKeys(e.target.value ? [e.target.value] : [])"
-                       @pressEnter="handleSearch(selectedKeys, column.dataIndex)"/>
+              <a-auto-complete
+                  @blur="standardiseTrialCompoundName(selectedKeys[0])"
+                  v-model:value="selectedKeys[0]"
+                  placeholder="Compound Name" type="text"
+                  @search="onSearch"
+                  :data-source="compoundPool"
+                  style="width: 188px; margin-bottom: 8px; display: block;"
+              />
               <a-button type="primary" size="small" style="width: 90px; margin-right: 8px"
                         @click="handleSearch(selectedKeys, column.dataIndex)">
                 <template v-slot:icon><search-outlined/></template>
                 Search
               </a-button>
-              <a-button size="small" style="width: 90px" @click="handleReset(clearFilters)">
+              <a-button size="small" style="width: 90px" @click="handleReset(clearFilters, column.dataIndex)">
                 Reset
               </a-button>
             </div>
@@ -119,10 +123,15 @@
             </a-button-group>
             <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
               <a-form layout="vertical" :model="recordEditForm">
-                <a-form-item label="Compound Name">
-                  <a-input v-model:value="recordEditForm.trialCompoundName" placeholder="Please input the compound name" type="text"
-                           @blur="standardiseTrialCompoundName(recordEditForm.trialCompoundName)"/>
-                </a-form-item>
+<!--                <a-form-item label="Compound Name">-->
+<!--                  <a-auto-complete-->
+<!--                      @blur="standardiseTrialCompoundName(recordEditForm.trialCompoundName)"-->
+<!--                      v-model:value="recordEditForm.trialCompoundName"-->
+<!--                      placeholder="Please input the compound name" type="text"-->
+<!--                      @search="onSearch"-->
+<!--                      :data-source="compoundPool"-->
+<!--                  />-->
+<!--                </a-form-item>-->
                 <a-form-item label="Trial Status" >
                   <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a trial status" :disabled="['t2'].includes(test.userType) && ['s1'].includes(recordEditForm.trialStatus)">
                     <a-select-option value="s0">
@@ -161,6 +170,7 @@ import {
   standardiseTrialCompoundName,
   standardiseTrialCountryCode,
 } from '../utils/formatter.js';
+import { compounds } from '../utils/compoundPool.js';
 import {
   SmileOutlined,
   SearchOutlined,
@@ -189,11 +199,17 @@ export default {
       tableSpec: {
         columns: [
           {
-            title: 'Trial Code',
+            title: 'Protocol Code',
             dataIndex: 'trialCode',
             slots: { customRender: 'trialCode' },
             width: '200px',
             // fixed: 'left',
+          },
+          {
+            title: 'Previous Protocol Code',
+            dataIndex: 'trialPreviousProtocolCode',
+            slots: { customRender: 'trialPreviousProtocolCode' },
+            width: '200px',
           },
           {
             title: 'Compound Name',
@@ -284,6 +300,7 @@ export default {
         confirmLoading: false,
       },
       recordEditForm: {},
+      compoundPool: compounds,
     };
   },
   mounted() {
@@ -298,6 +315,14 @@ export default {
     },
   },
   methods: {
+    onSearch: function (text) {
+      this.compoundPool = compounds;
+      this.compoundPool = this.compoundPool.filter(
+          (item) => {
+            return item.includes(text) || item.includes(text.toUpperCase());
+          }
+      );
+    },
     fetch: function () {
       this.tableSpec.loading = true;
       this.$axios.post(
@@ -329,8 +354,9 @@ export default {
     handleSearch(selectedKeys, dataIndex) {
       this.queryParams.filters[dataIndex] = selectedKeys[0];
     },
-    handleReset(clearFilters) {
+    handleReset(clearFilters, dataIndex) {
       clearFilters();
+      this.handleSearch('', dataIndex);
     },
     editRecord: function (text, targetRecord) {
       this.modelSpec.title = `Edit record "${ formatTrialCode(targetRecord) }"`;

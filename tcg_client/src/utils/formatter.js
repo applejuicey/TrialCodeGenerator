@@ -1,5 +1,6 @@
 import { message } from 'ant-design-vue';
 import country from "country-list-js";
+import { compounds } from './compoundPool.js';
 
 const formatTrialPhase = function (value) {
   const phaseMap = new Map();
@@ -28,7 +29,7 @@ const formatTrialCode = function (trialRecord) {
 
 const standardiseTrialCompoundName = function (name) {
   try {
-    if (!name) {
+    if (!name || !compounds.includes(name)) {
       throw new Error();
     }
     return {
@@ -39,7 +40,7 @@ const standardiseTrialCompoundName = function (name) {
     message.error('Please provide a valid compound name!', 6);
     return {
       status: false,
-      result: '',
+      result: name.trim().toUpperCase(),
     };
   }
 }

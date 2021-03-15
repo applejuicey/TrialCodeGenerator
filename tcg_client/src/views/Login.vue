@@ -6,7 +6,7 @@
           <div class="my-card-header-title">
             Hengrui Department of R.&D.
             <br>
-            Clinical Trial Number Registration Platform
+            Clinical Trial Code Registration Platform
           </div>
           <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">

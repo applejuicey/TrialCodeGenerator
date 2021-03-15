@@ -6,23 +6,24 @@
         <template v-slot:icon><smile-outlined/></template>
         <template v-slot:description>
           <p>
-            On this page, you can fill in and submit the following form to upload the required information for requesting a trial code.
+            On this page, you can fill in and submit the following form to upload the required information for requesting a trial protocol code.
           </p>
           <ul>
             <li>
-              The '<b>Compound Name</b>' will be converted automatically to capital letters.
+              The input in the '<b>Compound Name</b>' field will be converted automatically into capital letters.
               Blank spaces should <b>NOT</b> be included in the middle of the compound name.
-              This information will be used when generating the unique trial code.
+              This information will be used when generating the unique trial protocol code.
             </li>
             <li>
               An exhaustive list of '0', 'I', 'I/II', 'I/III', 'II', 'II/III', 'IIa', 'IIb', 'III', 'IIIa', 'IIIb', 'IV' and 'NA' is employed in the '<b>Trial Phase</b>' dropdown selector.
-              This information will be used when generating the unique trial code. <b>Please pay particular attention to the correctness of this field.</b>
+              This information will be used when generating the unique trial protocol code. <b>Please pay particular attention to the correctness of this field.</b>
             </li>
             <li>
               The '<b>Date of Generation</b>' calendar dropdown selector provides the date that the record was created.
             </li>
             <li>
-              The '<b>Country Code</b>' should be a string composed of valid Alpha-3 codes (e.g. <span class="ant-green">CHN</span>) or the english short name (e.g. <span class="ant-green">China</span>) of the country according to the
+              The '<b>Country Code</b>' should be a string composed of valid Alpha-3 codes (e.g. <span class="ant-green">CHN</span>)
+              or the english name (e.g. <span class="ant-green">China</span>) of the country according to
               <a href="https://en.wikipedia.org/wiki/ISO_3166-1">ISO-3166-1</a>, separated by commas. For example, 'CHN, USA' is recommended for
               a multi-centre international trial which has its main site located in China and another site in the USA.
             </li>
@@ -34,16 +35,13 @@
       </div>
       <div class="generatorForm" v-if="!submitted">
         <div class="header">
-          <span>Clinical Trial Protocol Number Registration Platform</span>
+          <span>Clinical Trial Protocol Code Registration Platform</span>
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
-<!--            <a-input v-model:value="codeGeneratorForm.trialCompoundName" placeholder="Please input the compound name" type="text"-->
-<!--                     @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"/>-->
-<!--            @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"-->
-<!--            v-model:value="codeGeneratorForm.trialCompoundName"-->
             <a-auto-complete
-
+                @blur="standardiseTrialCompoundName(codeGeneratorForm.trialCompoundName)"
+                v-model:value="codeGeneratorForm.trialCompoundName"
                 placeholder="Please input the compound name" type="text"
                 @search="onSearch"
                 :data-source="compoundPool"
@@ -116,7 +114,12 @@
                   :sub-title="submissionResult.subTitle">
           <template #extra>
             <a-button type="primary" @click="pushRoute('trial-list')">
+              <BarsOutlined />
               Trial List
+            </a-button>
+            <a-button type="primary" @click="refresh">
+              <ArrowRightOutlined />
+              Continue
             </a-button>
           </template>
         </a-result>
@@ -140,7 +143,10 @@ import {
   NotificationOutlined,
   CheckCircleOutlined,
   InfoCircleOutlined,
+  BarsOutlined,
+  ArrowRightOutlined,
 } from '@ant-design/icons-vue';
+import { compounds } from '../utils/compoundPool.js';
 export default {
   components: {
     SmileOutlined,
@@ -149,6 +155,8 @@ export default {
     NotificationOutlined,
     CheckCircleOutlined,
     InfoCircleOutlined,
+    BarsOutlined,
+    ArrowRightOutlined,
   },
   data () {
     return {
@@ -168,17 +176,12 @@ export default {
         title: 'Internal Error',
         subTitle: 'It seems that an internal error has happened...',
       },
-      compoundPool: ['SHR3680', 'SHR1210', 'TEST666'],
+      compoundPool: compounds,
     };
-  },
-  mounted() {
-    this.$notification['info']({
-      message: 'Welcome',
-      description: 'Hi, nice to meet you! If you have any suggestion or bug report on this public test version, feel free to contact us through fanyang@hrglobe.cn.',
-    });
   },
   methods: {
     onSearch: function (text) {
+      this.compoundPool = compounds;
       this.compoundPool = this.compoundPool.filter(
           (item) => {
             return item.includes(text) || item.includes(text.toUpperCase());
@@ -186,7 +189,7 @@ export default {
       );
     },
     showExample: function () {
-      this.codeGeneratorForm.trialCompoundName = 'SHR1210';
+      this.codeGeneratorForm.trialCompoundName = 'SHR-1210';
       this.codeGeneratorForm.trialPhase = 'p1';
       this.codeGeneratorForm.trialCountryCode = 'CHN,USA';
     },
@@ -218,7 +221,7 @@ export default {
         this.submissionResult.title = 'Action Succeeded';
         const createdTrial = response.data.createdTrial;
         const trialCode = formatTrialCode(createdTrial);
-        this.submissionResult.subTitle = `Your submission is successful and the unique trial code is ${ trialCode }.`;
+        this.submissionResult.subTitle = `Your submission is successful and the unique trial protocol code is ${ trialCode }.`;
       }).catch((error) => {
         console.log(error);
         this.submissionResult.status = 'error';
@@ -233,6 +236,9 @@ export default {
       this.$router.push({
         name: routeName,
       })
+    },
+    refresh: function () {
+      location.reload();
     },
   },
 }

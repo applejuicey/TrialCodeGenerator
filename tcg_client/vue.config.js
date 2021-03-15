@@ -4,7 +4,7 @@ module.exports = {
     config
       .plugin('html')
       .tap(args => {
-        args[0].title= 'Trial Code Generator'
+        args[0].title= 'Trial Protocol Code Generator'
         return args
       })
   },

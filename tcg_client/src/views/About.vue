@@ -4,7 +4,7 @@
     <a-col :lg="16" :offset-lg="4">
       <div class="my-table-wrapper">
         <div class="my-card-header-title">
-          the 'Clinical Trial Protocol Number Registration Platform'
+          the 'Clinical Trial Protocol Code Registration Platform'
         </div>
         <div class="para-title">
           About Version Number (e.g. <span class="version-number">V a.b.c</span>):
@@ -34,7 +34,7 @@
               <span class="version-number">V 4.1.0</span>
               <ul>
                 <li>REV: 'Trial Phase' matching codes are revised.</li>
-                <li>REV: Country suffix is now removed from the generated trial code.</li>
+                <li>REV: Country suffix is now removed from the generated trial protocol code.</li>
                 <li>
                   REV: International trials no longer need to be marked by 'INT' in the 'Country' field.
                   They can be identified automatically if there are more than one country in the 'Country' field.

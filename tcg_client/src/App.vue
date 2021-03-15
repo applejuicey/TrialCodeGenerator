@@ -9,7 +9,7 @@
             <ToolOutlined/>Control Panel
           </a-menu-item>
           <a-menu-item key="2" @click="pushRoute('code-gen')">
-            <SettingOutlined/>Trial Code Generator
+            <SettingOutlined/>Protocol Code Generator
           </a-menu-item>
           <a-menu-item key="3" @click="pushRoute('trial-summary')">
             <TableOutlined/>Summary Table
@@ -28,7 +28,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Number Registration Platform Version 4.2.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 4.2.0
       </a-layout-footer>
     </a-layout>
 
@@ -109,12 +109,14 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+#app {
+  overflow-x: hidden;
+}
 #app-container {
   min-height: 100vh;
   background-size:cover;
   background-repeat: no-repeat;
-  overflow-x: hidden;
   width: 100vw;
 }
 #app-container .logo {
@@ -142,9 +144,6 @@ export default {
   text-align: center;
   background: #f0f2f51f;
 }
-</style>
-
-<style>
 .ant-alert {
   border-radius: 25px !important;
   background-color: #e6f7ffde !important;
