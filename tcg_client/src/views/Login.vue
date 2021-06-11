@@ -6,7 +6,7 @@
           <div class="my-card-header-title">
             Hengrui Department of R.&D.
             <br>
-            Clinical Trial Code Registration Platform
+            Clinical Trial Protocol Code Registration Platform
           </div>
           <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">
@@ -42,23 +42,26 @@ export default {
     }
   },
   methods: {
-    login: function () {
+    login: async function () {
       this.loginForm.waiting = true;
-      this.$axios.post(
-          '/login',
-          {
-            userInfo: {
-              username: this.loginForm.username,
-              password: this.loginForm.password,
-            }
-          },
-      ).then((response) => {
+      try {
+        let response = await this.$axios.post('/login', {
+          userInfo: {
+            username: this.loginForm.username,
+            password: this.loginForm.password,
+          }
+        });
+        // 登录成功后获取所有compound列表、并存入localStorage
+        let { data } = await this.$axios.post('/compound', {});
+        let compounds = data.queryResults.hitTargets;
+        localStorage.setItem('compounds', JSON.stringify(compounds));
+        // 处理路由
         if (['1'].includes(response.data.statusCode) && (['t2'].includes(response.data.loginResult.userType))) {
           localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
           this.$router.push({ name: 'code-gen'});
           return true;
         }
-        if (['1'].includes(response.data.statusCode) && (['t0', 't1'].includes(response.data.loginResult.userType))) {
+        if (['1'].includes(response.data.statusCode) && (['t0', 't1', 't3'].includes(response.data.loginResult.userType))) {
           localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
           this.$router.push({ name: 'trial-list'});
           return true;
@@ -72,12 +75,12 @@ export default {
           return false;
         }
         this.$message.error('Login Failed!', 6);
-      }).catch((error) => {
+      } catch (error) {
         this.$message.error(`Login Failed! Details: ${ error }`, 6);
-        console.log(error);
-      }).finally(() => {
+        console.error(error);
+      } finally {
         this.loginForm.waiting = false;
-      });
+      }
     },
   },
 }

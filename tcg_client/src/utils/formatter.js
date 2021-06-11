@@ -1,6 +1,6 @@
 import { message } from 'ant-design-vue';
 import country from "country-list-js";
-import { compounds } from './compoundPool.js';
+import { compounds } from './compounds.js';
 
 const formatTrialPhase = function (value) {
   const phaseMap = new Map();
@@ -11,6 +11,13 @@ const formatTrialPhase = function (value) {
     .set('p4', 'IV')
     .set('p0na', 'NA');
   return phaseMap.get(value);
+}
+
+const formatUserType = function (value) {
+  const userTypeMap = new Map();
+  userTypeMap.set('t0', 'root').set('t1', 'admin')
+    .set('t2', 'user').set('t3', 'readonly');
+  return userTypeMap.get(value);
 }
 
 const formatTrialUniqueSequenceCode = function (value) {
@@ -29,7 +36,7 @@ const formatTrialCode = function (trialRecord) {
 
 const standardiseTrialCompoundName = function (name) {
   try {
-    if (!name || !compounds.includes(name)) {
+    if (!name || !(compounds.includes(name) || compounds.includes(name.trim().toUpperCase()))) {
       throw new Error();
     }
     return {
@@ -40,7 +47,6 @@ const standardiseTrialCompoundName = function (name) {
     message.error('Please provide a valid compound name!', 6);
     return {
       status: false,
-      result: name.trim().toUpperCase(),
     };
   }
 }

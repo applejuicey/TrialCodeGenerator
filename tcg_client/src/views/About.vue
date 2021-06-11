@@ -22,6 +22,18 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 5.0.0</span>
+              <ul>
+                <li>REV: Valid compounds will now be imported on database initialisation.</li>
+                <li>REV: Default sequence of trials in the table on 'List' page is changed, which means 'Proposed' trials will
+                    be shown in the top rows.</li>
+                <li>REV: Table pagination BUGs fixed on 'List' page.</li>
+                <li>ADD: Usertype of readonly is added.</li>
+                <li>ADD: 'Protocol Name' field added.</li>
+                <li>REV: The sequence number algorithm is revised. Now '4' will never appear in the protocol code.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 4.2.0</span>
               <ul>
                 <li>ADD: 'International Indicator Column' is added on 'Summary Table'.</li>

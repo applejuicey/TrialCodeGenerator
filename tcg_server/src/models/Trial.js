@@ -75,6 +75,10 @@ Trial.init({
     type: Sequelize.STRING(100),
     allowNull: true,
   },
+  trialName: {
+    type: Sequelize.STRING(500),
+    allowNull: true,
+  },
 }, {
   sequelize,
   modelName: 'trial',

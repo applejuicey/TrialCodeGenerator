@@ -61,8 +61,8 @@ router.beforeEach(async (to, from, next) => {
   });
 
   // to login page && already logged in
-  if (to.name === 'login' && localTokenIsValid) {
-    if (['t0', 't1'].includes(decodedUserInfo.userType)) {
+  if (['login'].includes(to.name)  && localTokenIsValid) {
+    if (['t0', 't1', 't3'].includes(decodedUserInfo.userType)) {
       next({ name: 'trial-list' });
     }
     if (['t2'].includes(decodedUserInfo.userType)) {
@@ -71,8 +71,13 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // to pages other than the login page && not yet logged in
-  else if (to.name !== 'login' && !localTokenIsValid) {
+  else if (!['login'].includes(to.name) && !localTokenIsValid) {
     next({ name: 'login' });
+  }
+
+  // to generate page && user with userType of readonly
+  else if (['generator'].includes(to.name) && ['t3'].includes(decodedUserInfo.userType)) {
+    next({ name: 'trial-list' });
   }
 
   else {

@@ -8,7 +8,7 @@
           <a-menu-item key="1" @click="pushRoute('trial-list')">
             <ToolOutlined/>Control Panel
           </a-menu-item>
-          <a-menu-item key="2" @click="pushRoute('code-gen')">
+          <a-menu-item key="2" @click="pushRoute('code-gen')" v-if="!['t3'].includes(userInfo.userType)">
             <SettingOutlined/>Protocol Code Generator
           </a-menu-item>
           <a-menu-item key="3" @click="pushRoute('trial-summary')">
@@ -18,7 +18,7 @@
             <InfoCircleOutlined/>About
           </a-menu-item>
           <a-menu-item key="5" @click="logout">
-            <LogoutOutlined/>Logout
+            <LogoutOutlined/>Logout ({{ userInfo.username }})
           </a-menu-item>
         </a-menu>
       </a-layout-header>
@@ -28,7 +28,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 4.2.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.0.0
       </a-layout-footer>
     </a-layout>
 
@@ -64,6 +64,7 @@ export default {
     return {
       locale: enGB,
       allBackgroundImages: allBackgroundImages,
+
     };
   },
   computed: {
@@ -84,6 +85,9 @@ export default {
         backgroundImage: `url(${ this.allBackgroundImages[randIndex] })`
       }
     },
+    userInfo: function () {
+      return JSON.parse(localStorage.getItem('userInfo'));
+    }
   },
   methods: {
     pushRoute: function (routeName) {
@@ -99,9 +103,11 @@ export default {
         content: 'Are you sure to logout? Please click \'OK\' to confirm your action.',
         onOk() {
           localStorage.removeItem('userInfo');
+          localStorage.removeItem('compounds');
           self.$router.push({
             name: 'login',
           });
+          location.reload();
         },
       });
     },
@@ -173,5 +179,12 @@ export default {
   font-weight: lighter;
   font-size: large;
   padding: 30px 0 30px 0;
+}
+.my-table-wrapper-header {
+  font-weight: lighter;
+  font-size: xx-large;
+  margin: 4px 4px 20px 4px;
+  padding: 4px;
+  text-align: center;
 }
 </style>

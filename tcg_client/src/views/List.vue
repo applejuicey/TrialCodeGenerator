@@ -2,6 +2,98 @@
   <a-row>
 
     <a-col :lg="24" class="content">
+      <div class="my-table-wrapper">
+        <div class="my-table-wrapper-header">
+          <span>Trials List</span>
+        </div>
+        <a-table
+            :scroll="{ x: 'max-content', y: 'max-content' }"
+            :columns="tableSpec.columns"
+            :row-key="record => record.trialUUID"
+            :data-source="tableSpec.data"
+            :pagination="tableSpec.pagination"
+            :loading="tableSpec.loading"
+            @change="handleTableChange"
+            bordered
+        >
+          <template v-slot:trialCode="{ text, record }">
+            <span>{{ formatTrialCode(record) }}</span>
+          </template>
+          <template v-slot:filterDropdown="{ setSelectedKeys, selectedKeys, clearFilters, column }">
+            <div style="padding: 8px">
+              <a-auto-complete
+                  @blur="standardiseTrialCompoundName(selectedKeys[0])"
+                  v-model:value="selectedKeys[0]"
+                  placeholder="Compound Name" type="text"
+                  @search="onSearch"
+                  :data-source="compoundPool"
+                  style="width: 188px; margin-bottom: 8px; display: block;"
+              />
+              <a-button type="primary" size="small" style="width: 90px; margin-right: 8px"
+                        @click="handleSearch(selectedKeys, column.dataIndex)">
+                <template v-slot:icon><search-outlined/></template>
+                Search
+              </a-button>
+              <a-button size="small" style="width: 90px" @click="handleReset(clearFilters, column.dataIndex)">
+                Reset
+              </a-button>
+            </div>
+          </template>
+          <template v-slot:filterIcon="filtered">
+            <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
+          </template>
+          <template v-slot:trialStatus="{ text, record }">
+            <a-badge :status="formatTrialStatus(text).status"/>
+            <span :style="`color: ${ formatTrialStatus(text).color }`">
+              {{ formatTrialStatus(text).text }}
+            </span>
+          </template>
+          <template v-slot:trialGenerationDate="{ text }">
+            <span>{{ formatTrialGenerationDate(text) }}</span>
+          </template>
+          <template v-slot:trialPhase="{ text }">
+            <span>{{ formatTrialPhase(text) }}</span>
+          </template>
+          <template v-slot:action="{ text, record }" v-if="!['t3'].includes(userInfo.userType)">
+            <a-button-group>
+              <a-button type="primary" size="small"
+                        @click="editRecord(text, record)">
+                <template v-slot:icon><edit-outlined/></template>
+              </a-button>
+            </a-button-group>
+            <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
+              <a-form layout="vertical" :model="recordEditForm">
+                <a-form-item label="Protocol Status" >
+                  <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a protocol status" :disabled="['t2'].includes(userInfo.userType) && ['s1'].includes(recordEditForm.trialStatus)">
+                    <a-select-option value="s0">
+                      Proposed
+                    </a-select-option>
+                    <a-select-option value="s1" v-if="!(['t2'].includes(userInfo.userType) && ['s0', 's2'].includes(recordEditForm.trialStatus))">
+                      Confirmed
+                    </a-select-option>
+                    <a-select-option value="s2">
+                      Suspended
+                    </a-select-option>
+                  </a-select>
+                </a-form-item>
+                <a-form-item label="Protocol Name" placeholder="Please fill in the protocol name">
+                  <a-textarea v-model:value="recordEditForm.trialName" />
+                </a-form-item>
+                <a-form-item label="Status Description" placeholder="Please fill in the reason for protocol status change">
+                  <a-textarea v-model:value="recordEditForm.trialStatusDescription" />
+                </a-form-item>
+                <a-form-item label="Country Code">
+                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text"
+                           @blur="standardiseTrialCountryCode(recordEditForm.trialCountryCode)"/>
+                </a-form-item>
+              </a-form>
+            </a-modal>
+          </template>
+        </a-table>
+      </div>
+      <div class="divider">
+        &nbsp;
+      </div>
       <a-alert message="Instructions" type="info" show-icon class="instruction">
         <template v-slot:icon><smile-outlined/></template>
         <template v-slot:description>
@@ -50,7 +142,7 @@
               function is implemented in this column.
             </li>
             <li>
-              The '<b>NO.</b>' column presents the sequence of a specific trial per phase per compound.
+              The '<b>NO.</b>' column presents the sequence of a specific trial within a certain phase of one compound.
               This information will be used when generating the unique trial protocol code.
               '<span class="ant-blue"><sort-descending-outlined/>Sorting</span>'
               function is implemented in this column.
@@ -62,102 +154,6 @@
           </ul>
         </template>
       </a-alert>
-      <div class="divider">
-        &nbsp;
-      </div>
-      <div class="my-table-wrapper">
-        <a-table
-            :scroll="{ x: 'max-content', y: 'max-content' }"
-            :columns="tableSpec.columns"
-            :row-key="record => record.trialUUID"
-            :data-source="tableSpec.data"
-            :pagination="tableSpec.pagination"
-            :loading="tableSpec.loading"
-            @change="handleTableChange"
-            bordered
-        >
-          <template v-slot:trialCode="{ text, record }">
-            <span>{{ formatTrialCode(record) }}</span>
-          </template>
-          <template v-slot:filterDropdown="{ setSelectedKeys, selectedKeys, clearFilters, column }">
-            <div style="padding: 8px">
-              <a-auto-complete
-                  @blur="standardiseTrialCompoundName(selectedKeys[0])"
-                  v-model:value="selectedKeys[0]"
-                  placeholder="Compound Name" type="text"
-                  @search="onSearch"
-                  :data-source="compoundPool"
-                  style="width: 188px; margin-bottom: 8px; display: block;"
-              />
-              <a-button type="primary" size="small" style="width: 90px; margin-right: 8px"
-                        @click="handleSearch(selectedKeys, column.dataIndex)">
-                <template v-slot:icon><search-outlined/></template>
-                Search
-              </a-button>
-              <a-button size="small" style="width: 90px" @click="handleReset(clearFilters, column.dataIndex)">
-                Reset
-              </a-button>
-            </div>
-          </template>
-          <template v-slot:filterIcon="filtered">
-            <search-outlined :style="{ color: filtered ? '#108ee9' : undefined }" />
-          </template>
-          <template v-slot:trialStatus="{ text, record }">
-            <a-badge :status="formatTrialStatus(text).status"/>
-            <span :style="`color: ${ formatTrialStatus(text).color }`">
-            {{ formatTrialStatus(text).text }}
-          </span>
-          </template>
-          <template v-slot:trialGenerationDate="{ text }">
-            <span>{{ formatTrialGenerationDate(text) }}</span>
-          </template>
-          <template v-slot:trialPhase="{ text }">
-            <span>{{ formatTrialPhase(text) }}</span>
-          </template>
-          <template v-slot:action="{ text, record }">
-            <a-button-group>
-              <a-button type="primary" size="small"
-                        @click="editRecord(text, record)">
-                <template v-slot:icon><edit-outlined/></template>
-              </a-button>
-            </a-button-group>
-            <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
-              <a-form layout="vertical" :model="recordEditForm">
-<!--                <a-form-item label="Compound Name">-->
-<!--                  <a-auto-complete-->
-<!--                      @blur="standardiseTrialCompoundName(recordEditForm.trialCompoundName)"-->
-<!--                      v-model:value="recordEditForm.trialCompoundName"-->
-<!--                      placeholder="Please input the compound name" type="text"-->
-<!--                      @search="onSearch"-->
-<!--                      :data-source="compoundPool"-->
-<!--                  />-->
-<!--                </a-form-item>-->
-                <a-form-item label="Trial Status" >
-                  <a-select v-model:value="recordEditForm.trialStatus" placeholder="Please select a trial status" :disabled="['t2'].includes(test.userType) && ['s1'].includes(recordEditForm.trialStatus)">
-                    <a-select-option value="s0">
-                      Proposed
-                    </a-select-option>
-                    <a-select-option value="s1" v-if="!(['t2'].includes(test.userType) && ['s0', 's2'].includes(recordEditForm.trialStatus))">
-                      Confirmed
-                    </a-select-option>
-                    <a-select-option value="s2">
-                      Suspended
-                    </a-select-option>
-                  </a-select>
-                </a-form-item>
-                <a-form-item label="Status Description" placeholder="Please fill in the reason for trial status change">
-                  <a-textarea v-model:value="recordEditForm.trialStatusDescription" />
-                </a-form-item>
-                <a-form-item label="Country Code">
-                  <a-input v-model:value="recordEditForm.trialCountryCode" type="text"
-                           @blur="standardiseTrialCountryCode(recordEditForm.trialCountryCode)"/>
-                </a-form-item>
-              </a-form>
-            </a-modal>
-          </template>
-        </a-table>
-      </div>
-
     </a-col>
 
   </a-row>
@@ -170,7 +166,7 @@ import {
   standardiseTrialCompoundName,
   standardiseTrialCountryCode,
 } from '../utils/formatter.js';
-import { compounds } from '../utils/compoundPool.js';
+import { compounds } from '../utils/compounds.js';
 import {
   SmileOutlined,
   SearchOutlined,
@@ -190,39 +186,31 @@ export default {
   },
   data() {
     return {
-      test: JSON.parse(localStorage.getItem('userInfo')),
+      userInfo: JSON.parse(localStorage.getItem('userInfo')),
       queryParams: {
-        results: 20,
+        results: 10,
         page: 1,
         filters: {},
       },
       tableSpec: {
         columns: [
           {
-            title: 'Protocol Code',
-            dataIndex: 'trialCode',
-            slots: { customRender: 'trialCode' },
-            width: '200px',
-            // fixed: 'left',
-          },
-          {
-            title: 'Previous Protocol Code',
-            dataIndex: 'trialPreviousProtocolCode',
-            slots: { customRender: 'trialPreviousProtocolCode' },
-            width: '200px',
-          },
-          {
             title: 'Compound Name',
             dataIndex: 'trialCompoundName',
             sorter: (a, b) => {
               return a.trialCompoundName.localeCompare(b.trialCompoundName)
             },
-            defaultSortOrder: 'ascend',
             sortDirections: ['descend', 'ascend'],
             slots: {
               filterDropdown: 'filterDropdown',
               filterIcon: 'filterIcon',
             },
+            width: '200px',
+          },
+          {
+            title: 'Protocol Code',
+            dataIndex: 'trialCode',
+            slots: { customRender: 'trialCode' },
             width: '200px',
           },
           {
@@ -235,6 +223,16 @@ export default {
             ],
             slots: { customRender: 'trialStatus' },
             width: '120px',
+          },
+          {
+            title: 'Protocol Name',
+            dataIndex: 'trialName',
+            width: '400px',
+          },
+          {
+            title: 'Previous Protocol Code',
+            dataIndex: 'trialPreviousProtocolCode',
+            width: '200px',
           },
           {
             title: 'Status Description',
@@ -268,6 +266,7 @@ export default {
             sorter: (a, b) => {
               return a.trialPhase.localeCompare(b.trialPhase);
             },
+            sortDirections: ['descend', 'ascend'],
             slots: { customRender: 'trialPhase' },
             width: '100px',
           },
@@ -284,13 +283,12 @@ export default {
             title: 'Action',
             slots: { customRender: 'action' },
             width: '100px',
-            // fixed: 'right',
             align: 'center',
           },
         ],
         data: [],
         pagination: {
-          defaultPageSize: 20,
+          defaultPageSize: 10,
         },
         loading: false,
       },
@@ -316,12 +314,11 @@ export default {
   },
   methods: {
     onSearch: function (text) {
+      // 每次都初始化compoundPool
       this.compoundPool = compounds;
-      this.compoundPool = this.compoundPool.filter(
-          (item) => {
-            return item.includes(text) || item.includes(text.toUpperCase());
-          }
-      );
+      this.compoundPool = this.compoundPool.filter((item) => {
+        return item.includes(text) || item.includes(text.toUpperCase());
+      });
     },
     fetch: function () {
       this.tableSpec.loading = true;
@@ -337,7 +334,7 @@ export default {
         this.tableSpec.loading = false;
         this.tableSpec.pagination = pagination;
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
         this.tableSpec.loading = false;
       });
     },
@@ -345,14 +342,16 @@ export default {
       const pager = { ...this.tableSpec.pagination };
       pager.current = pagination.current;
       this.tableSpec.pagination = pager;
+      // 根据当前表格信息更新post参数
       this.queryParams.results = pagination.pageSize? pagination.pageSize : this.queryParams.results;
       this.queryParams.page = pagination.current? pagination.current : this.queryParams.page;
-      this.queryParams.sortField = sorter.field? sorter.field : this.queryParams.sortField;
-      this.queryParams.sortOrder = sorter.order? sorter.order : this.queryParams.sortOrder;
       this.queryParams.filters = { ...this.queryParams.filters, ...filters };
     },
     handleSearch(selectedKeys, dataIndex) {
       this.queryParams.filters[dataIndex] = selectedKeys[0];
+      // 每次改变化合物名称时，分页需要被重置为第一页
+      this.tableSpec.pagination.current = 1;
+      this.queryParams.page = this.tableSpec.pagination.current;
     },
     handleReset(clearFilters, dataIndex) {
       clearFilters();
@@ -387,7 +386,7 @@ export default {
           location.reload();
         }, 5000)
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
         this.$notification['error']({
           message: 'Action Failed',
           description: `Sorry, your request failed. Detailed error description is listed as follows:${ error }`,

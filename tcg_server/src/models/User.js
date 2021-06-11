@@ -29,7 +29,7 @@ User.init({
   },
   userType: {
     type: Sequelize.ENUM,
-    values: ['t0', 't1', 't2'],
+    values: ['t0', 't1', 't2', 't3'],
     allowNull: false,
     defaultValue: "t2",
     validate: {

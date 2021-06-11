@@ -11,7 +11,9 @@ const createOneTrial = async function(newTrial) {
         trialPhase: newTrial.trialPhase,
         trialGenerationDate: newTrial.trialGenerationDate,
         trialCountryCode: newTrial.trialCountryCode,
+        trialName: newTrial.trialName,
       };
+      // 获取当前化合物及期型下最大编号
       let currentMaxUniqueSequenceCode = await Trial.max(
         'trialUniqueSequenceCode',
         {
@@ -25,8 +27,16 @@ const createOneTrial = async function(newTrial) {
           },
         },
       );
+      // 如果当前化合物及期型下最大编号不存在，说明是全新的
       currentMaxUniqueSequenceCode = currentMaxUniqueSequenceCode? currentMaxUniqueSequenceCode : 0;
-      parsedNewTrial.trialUniqueSequenceCode = currentMaxUniqueSequenceCode + 1;
+      // 下一个编号为最大编号加一，如果其中包含4则跳过
+      let newSeq = currentMaxUniqueSequenceCode + 1;
+      let newSeqStr = newSeq.toString();
+      while (newSeqStr.indexOf('4') !== -1) {
+        newSeq = newSeq + 1;
+        newSeqStr = newSeq.toString();
+      }
+      parsedNewTrial.trialUniqueSequenceCode = newSeq;
       return await Trial.create(
         parsedNewTrial,
       );
@@ -48,12 +58,18 @@ const getSpecificTrials = async function(batchQueryParams) {
     queryResults.hitTargets = await Trial.findAll({
       offset: batchQueryParams.results * (batchQueryParams.page - 1),
       limit: batchQueryParams.results,
-      // order: [
-      //   [batchQueryParams.sortField, batchQueryParams.sortOrder === 'descend'? 'DESC' : 'ASC'],
-      // ],
+      order: [
+        ['trialStatus', 'ASC'],
+        ['trialGenerationDate', 'DESC'],
+        ['trialCompoundName', 'ASC'],
+        ['trialPhase', 'ASC'],
+        ['trialUniqueSequenceCode', 'ASC'],
+      ],
       where: queryFilters,
     });
-    queryResults.totalCount = await Trial.count();
+    queryResults.totalCount = await Trial.count({
+      where: queryFilters,
+    });
     return queryResults;
   } catch (error) {
     console.error(error)
@@ -73,6 +89,7 @@ const updateOneTrial = async function(updatedTrial) {
       targetRecord.trialPhase = updatedTrial.trialPhase;
       targetRecord.trialCountryCode = updatedTrial.trialCountryCode;
       targetRecord.trialStatus = updatedTrial.trialStatus;
+      targetRecord.trialName = updatedTrial.trialName;
       targetRecord.trialStatusDescription = updatedTrial.trialStatusDescription;
       return await targetRecord.save();
     });
@@ -102,6 +119,11 @@ const getSummary = async function(summaryParams) {
   try {
     if (summaryParams.compoundNames.includes('ALL')) {
       return await Trial.findAll({
+        order: [
+          ['trialCompoundName', 'ASC'],
+          ['trialPhase', 'ASC'],
+          ['trialUniqueSequenceCode', 'ASC'],
+        ],
         where: {
           trialStatus: 's1',
         },

@@ -6,15 +6,15 @@
         <template v-slot:icon><smile-outlined/></template>
         <template v-slot:description>
           <p>
-            On this page, you can get a summary table of one or more specific compounds.
+            On this page, you can get a summary table of one or more compounds.
             </p>
           <ol>
             <li>
               You should first type in the compound names in the text area on the left side (sometimes it may expand the full width across your screen).
               The compound names should be separated by commas, for example,
               <br>
-              <code class="ant-green">SHR1210, SHR3680</code>&nbsp;
-              <CopyOutlined class="ant-blue" @click="copyToClipBoard('SHR1210, SHR3680')"/>
+              <code class="ant-green">SHR-1210, SHR-1701</code>&nbsp;
+              <CopyOutlined class="ant-blue" @click="copyToClipBoard('SHR-1210, SHR-1701')"/>
               <br>
               If you want a summary of all compounds, you can input as follows:
               <br>
@@ -143,7 +143,9 @@ export default {
           },
         ],
         data: [],
-        pagination: false,
+        pagination: {
+          defaultPageSize: 10,
+        },
         loading: false,
       },
     };
@@ -166,7 +168,7 @@ export default {
       ).then((response) => {
         this.tableSpec.data = this.parseSummaryResults(response.data.queryResults);
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
       }).finally(() => {
         this.queryForm.waiting = false;
         this.tableSpec.loading = false;

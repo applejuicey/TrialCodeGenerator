@@ -12,4 +12,7 @@ const { loginController, verifyTokenController } = require('../controllers/login
 router.post('/api/login', loginController);
 router.post('/api/verify-token', verifyTokenController);
 
+const { getCompoundsController } = require('../controllers/compound');
+router.post('/api/compound', getCompoundsController);
+
 module.exports = router;
