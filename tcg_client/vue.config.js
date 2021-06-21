@@ -4,7 +4,7 @@ module.exports = {
     config
       .plugin('html')
       .tap(args => {
-        args[0].title= 'Trial Protocol Code Generator'
+        args[0].title= 'Trial Protocol Code Registration Platform'
         return args
       })
   },
@@ -13,16 +13,16 @@ module.exports = {
     host: "localhost",
     https: false,
     open: false,
-    proxy: {
-      "/api": {
-        target: "http://10.10.8.21:26108/api",
-        // target: "http://localhost:4359/api",
-        changeOrigin: true,
-        ws: true,
-        pathRewrite: {
-          "^/api": ""
-        },
-      },
-    },
+    // proxy: {
+    //   "/api": {
+    //     target: "http://10.10.8.21:26108/api",
+    //     // target: "http://localhost:4359/api",
+    //     changeOrigin: true,
+    //     ws: true,
+    //     pathRewrite: {
+    //       "^/api": ""
+    //     },
+    //   },
+    // },
   },
 }
