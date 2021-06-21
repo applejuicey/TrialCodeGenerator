@@ -10,14 +10,22 @@
           </div>
           <a-form :model="loginForm" :layout="loginForm.layout">
             <a-form-item label="Username">
-              <a-input v-model:value="loginForm.username" placeholder="Please input the username" type="text" @pressEnter="login" autofocus/>
+              <a-input v-model:value="loginForm.username" placeholder="Please input the username" type="text" @pressEnter="login" autofocus>
+                <template #prefix>
+                  <UserOutlined />
+                </template>
+              </a-input>
             </a-form-item>
             <a-form-item label="Password">
-              <a-input v-model:value="loginForm.password" placeholder="Please input the password" type="password" @pressEnter="login"/>
+              <a-input v-model:value="loginForm.password" placeholder="Please input the password" type="password" @pressEnter="login">
+                <template #prefix>
+                  <KeyOutlined />
+                </template>
+              </a-input>
             </a-form-item>
             <a-form-item :wrapper-col="loginForm.wrapperColButton" class="button-container">
               <a-button type="primary" @click="login" v-if="!loginForm.waiting">
-                Login
+                <LoginOutlined />Login
               </a-button>
               <a-spin v-else/>
             </a-form-item>
@@ -29,7 +37,17 @@
 </template>
 
 <script>
+import {
+  UserOutlined,
+  KeyOutlined,
+  LoginOutlined,
+} from '@ant-design/icons-vue';
 export default {
+  components: {
+    UserOutlined,
+    KeyOutlined,
+    LoginOutlined,
+  },
   data() {
     return {
       loginForm: {
@@ -45,33 +63,36 @@ export default {
     login: async function () {
       this.loginForm.waiting = true;
       try {
-        let response = await this.$axios.post('/login', {
+        const response = await this.$axios.post('/auth/login', {
           userInfo: {
             username: this.loginForm.username,
             password: this.loginForm.password,
           }
         });
-        // 登录成功后获取所有compound列表、并存入localStorage
-        let { data } = await this.$axios.post('/compound', {});
-        let compounds = data.queryResults.hitTargets;
-        localStorage.setItem('compounds', JSON.stringify(compounds));
-        // 处理路由
-        if (['1'].includes(response.data.statusCode) && (['t2'].includes(response.data.loginResult.userType))) {
+        // 登录成功
+        if (['1'].includes(response.data.statusCode)) {
+          // 获取所有化合物信息并存入localStorage供后续使用
+          let { data } = await this.$axios.post('/compound/query', {});
+          let compounds = data.queryResults.hitTargets;
+          localStorage.setItem('compounds', JSON.stringify(compounds));
+          // 将userInfo存入localStorage供后续使用
           localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
-          this.$router.push({ name: 'code-gen'});
+          if (['t2'].includes(response.data.loginResult.userType)) {
+            this.$router.push({ name: 'code-gen'});
+          }
+          if (['t0', 't1', 't3'].includes(response.data.loginResult.userType)) {
+            this.$router.push({ name: 'trial-list'});
+          }
           return true;
         }
-        if (['1'].includes(response.data.statusCode) && (['t0', 't1', 't3'].includes(response.data.loginResult.userType))) {
-          localStorage.setItem('userInfo', JSON.stringify(response.data.loginResult));
-          this.$router.push({ name: 'trial-list'});
-          return true;
-        }
-        if (['0'].includes(response.data.statusCode) && response.data.error.message.includes('username')) {
-          this.$message.error('Invalid Username!', 6);
-          return false;
-        }
-        if (['0'].includes(response.data.statusCode) && response.data.error.message.includes('password')) {
-          this.$message.error('Invalid Password!', 6);
+        // 登录失败
+        if (['0'].includes(response.data.statusCode)) {
+          if (response.data.error.message.includes('username')) {
+            this.$message.error('Invalid Username!', 6);
+          }
+          if (response.data.error.message.includes('password')) {
+            this.$message.error('Invalid Password!', 6);
+          }
           return false;
         }
         this.$message.error('Login Failed!', 6);

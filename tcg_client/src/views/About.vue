@@ -22,6 +22,14 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 5.1.0</span>
+              <ul>
+                <li>REV: APIs of both ends are changed.</li>
+                <li>REV: Client UI minor revision.</li>
+                <li>ADD: User password can now be updated.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 5.0.0</span>
               <ul>
                 <li>REV: Valid compounds will now be imported on database initialisation.</li>

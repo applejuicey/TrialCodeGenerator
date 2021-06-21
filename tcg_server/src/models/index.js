@@ -9,8 +9,8 @@ const User = require('./User');
 const Compound = require('./Compound');
 
 // all models(tables) should be initiated upon first-time execution
-const needInitialization = true;
-// const needInitialization = false;
+// const needInitialization = true;
+const needInitialization = false;
 if (needInitialization) {
   sequelize.sync({
     force: true

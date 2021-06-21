@@ -10,7 +10,11 @@
           </p>
           <ul>
             <li>
-              The text in the '<b>Compound Name</b>' field will be converted automatically into capital letters.
+              Click into the '<b>Compound Name</b>' input box to load the predefined compound list.
+              <a href = "mailto:yang.fan@hengrui.com?subject = Add new compound request&body = Please add (NEW COMPOUND NAME) to the current pool.">
+                Mail a request
+              </a>if you need a new compound which is not included in the current pool.
+              The text in the field will be converted automatically into capital letters.
               Blank spaces should <b>NOT</b> be included in the middle of the compound name.
               This information will be used when generating the unique trial protocol code.
             </li>
@@ -38,7 +42,8 @@
       </div>
       <div class="generatorForm" v-if="!submitted">
         <div class="my-table-wrapper-header">
-          <span>Clinical Trial Protocol Code Registration Platform</span>
+          <FormOutlined />&nbsp;
+          <span>Protocol Registration</span>
         </div>
         <a-form :model="codeGeneratorForm" :label-col="labelCol" :wrapper-col="wrapperColContent">
           <a-form-item label="Compound Name">
@@ -143,6 +148,7 @@ import {
   standardiseTrialCountryCode,
 } from '../utils/formatter.js';
 import {
+  FormOutlined,
   SmileOutlined,
   UserOutlined,
   LaptopOutlined,
@@ -155,6 +161,7 @@ import {
 import { compounds } from '../utils/compounds.js';
 export default {
   components: {
+    FormOutlined,
     SmileOutlined,
     UserOutlined,
     LaptopOutlined,
@@ -206,7 +213,7 @@ export default {
     standardiseTrialCountryCode: function (countryCode) {
       this.codeGeneratorForm.trialCountryCode = standardiseTrialCountryCode(countryCode).result;
     },
-    generateTrialCode: function () {
+    generateTrialCode: async function () {
       if (
           !standardiseTrialCompoundName(this.codeGeneratorForm.trialCompoundName).status ||
           !standardiseTrialCountryCode(this.codeGeneratorForm.trialCountryCode).status
@@ -217,26 +224,27 @@ export default {
         return;
       }
       this.waiting = true;
-      this.$axios.post(
-          '/trial/generate',
-          {
-            newTrial: this.codeGeneratorForm,
-          },
-      ).then((response) => {
-        this.submissionResult.status = 'success';
-        this.submissionResult.title = 'Action Succeeded';
-        const createdTrial = response.data.createdTrial;
-        const trialCode = formatTrialCode(createdTrial);
-        this.submissionResult.subTitle = `Your submission is successful and the unique trial protocol code is ${ trialCode }.`;
-      }).catch((error) => {
+      try {
+        const response = await this.$axios.post('/trial/generate', {
+          newTrial: this.codeGeneratorForm,
+        });
+        // 创建试验成功
+        if (['1'].includes(response.data.statusCode)) {
+          this.submissionResult.status = 'success';
+          this.submissionResult.title = 'Action Succeeded';
+          const createdTrial = response.data.createdTrial;
+          const trialCode = formatTrialCode(createdTrial);
+          this.submissionResult.subTitle = `Your submission is successful and the unique trial protocol code is ${ trialCode }.`;
+        }
+      } catch (error) {
         console.error(error);
         this.submissionResult.status = 'error';
         this.submissionResult.title = 'Action Failed';
         this.submissionResult.subTitle = `Your submission failed, detailed error is listed as follows: ${ error }.`;
-      }).finally(() => {
+      } finally {
         this.waiting = false;
         this.submitted = true;
-      });
+      }
     },
     pushRoute: function (routeName) {
       this.$router.push({

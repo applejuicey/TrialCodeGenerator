@@ -1,6 +1,6 @@
 const { getSpecificCompounds } = require('../service/compound');
 
-const getCompoundsController = async (ctx, next) => {
+const compoundQueryController = async (ctx, next) => {
   let result;
   try {
     const queryResults = await getSpecificCompounds(ctx.request.body.batchQueryParams);
@@ -13,8 +13,8 @@ const getCompoundsController = async (ctx, next) => {
     result = {
       statusCode: "0",
       error: {
-        message: `unknown error when doing compounds batch queries: ${error}`,
-        errorCode: '0_C_BATCH_QUERY',
+        message: `unknown error when doing compound query: ${error}`,
+        errorCode: '0_COMPOUND_QUERY',
       },
     };
   } finally {
@@ -22,4 +22,4 @@ const getCompoundsController = async (ctx, next) => {
   }
 };
 
-module.exports = { getCompoundsController };
+module.exports = { compoundQueryController };

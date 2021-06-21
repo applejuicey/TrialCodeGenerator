@@ -4,7 +4,8 @@
     <a-col :lg="24" class="content">
       <div class="my-table-wrapper">
         <div class="my-table-wrapper-header">
-          <span>Trials List</span>
+          <OrderedListOutlined />&nbsp;
+          <span>List of Trials</span>
         </div>
         <a-table
             :scroll="{ x: 'max-content', y: 'max-content' }"
@@ -99,15 +100,13 @@
         <template v-slot:description>
           <p>
             On this page, you can view and edit any trial in the database.
+            All records will be loaded from the server automatically upon mounting of this page.
+            Any successful change on the record will trigger a page refreshing.
+          </p>
+          <p>
+            The meaning of each table field is listed as follows:
           </p>
           <ul>
-            <li>
-              All records will be loaded from the server automatically upon mounting of this page.
-              Any successful change on the record will trigger a page refreshing.
-            </li>
-            <li>
-              The unique trial protocol code is listed in the '<b>Protocol Code</b>' column.
-            </li>
             <li>
               The compound name is listed in the '<b>Compound Name</b>' column.
               This information will be used when generating the unique trial protocol code.
@@ -116,11 +115,21 @@
               You can input a compound name in the popup box after clicking the '<span class="ant-blue"><SearchOutlined/>Searching</span>' icon to execute a more accurate search.
             </li>
             <li>
+              The unique trial protocol code is listed in the '<b>Protocol Code</b>' column.
+            </li>
+            <li>
               An exhaustive list of '<span class="ant-green">Confirmed</span>',
               '<span class="ant-blue">Proposed</span>' and
               '<span class="ant-red">Suspended</span>' is employed in the '<b>Status</b>' column.
               Click the '<span class="ant-blue"><FilterOutlined/>Filtering</span>'
               icon to filter the column.
+            </li>
+            <li>
+              The protocol name is listed in the '<b>Protocol Name</b>' column.
+            </li>
+            <li>
+              The previous protocol code is listed in the '<b>Previous Protocol Code</b>' column.
+              Note that trials which are registered on this platform do not have this value.
             </li>
             <li>
               A description of change of trial status or other important information is listed in the '<b>Status Description</b>' column.
@@ -168,6 +177,7 @@ import {
 } from '../utils/formatter.js';
 import { compounds } from '../utils/compounds.js';
 import {
+  OrderedListOutlined,
   SmileOutlined,
   SearchOutlined,
   DeleteOutlined,
@@ -177,6 +187,7 @@ import {
 } from '@ant-design/icons-vue';
 export default {
   components: {
+    OrderedListOutlined,
     SmileOutlined,
     SearchOutlined,
     DeleteOutlined,
@@ -320,23 +331,24 @@ export default {
         return item.includes(text) || item.includes(text.toUpperCase());
       });
     },
-    fetch: function () {
+    fetch: async function () {
       this.tableSpec.loading = true;
-      this.$axios.post(
-          '/trial/batchQuery',
-          {
-            batchQueryParams: this.queryParams,
-          },
-      ).then((response) => {
-        const pagination = { ...this.tableSpec.pagination };
-        pagination.total = response.data.queryResults.totalCount;
-        this.tableSpec.data = response.data.queryResults.hitTargets;
-        this.tableSpec.loading = false;
-        this.tableSpec.pagination = pagination;
-      }).catch((error) => {
+      try {
+        const response = await this.$axios.post('/trial/query', {
+          batchQueryParams: this.queryParams,
+        });
+        // 获取项目资料成功
+        if (['1'].includes(response.data.statusCode)) {
+          const pagination = { ...this.tableSpec.pagination };
+          pagination.total = response.data.queryResults.totalCount;
+          this.tableSpec.data = response.data.queryResults.hitTargets;
+          this.tableSpec.pagination = pagination;
+        }
+      } catch (error) {
         console.error(error);
+      } finally {
         this.tableSpec.loading = false;
-      });
+      }
     },
     handleTableChange: function (pagination, filters, sorter) {
       const pager = { ...this.tableSpec.pagination };
@@ -347,13 +359,13 @@ export default {
       this.queryParams.page = pagination.current? pagination.current : this.queryParams.page;
       this.queryParams.filters = { ...this.queryParams.filters, ...filters };
     },
-    handleSearch(selectedKeys, dataIndex) {
+    handleSearch: function (selectedKeys, dataIndex) {
       this.queryParams.filters[dataIndex] = selectedKeys[0];
       // 每次改变化合物名称时，分页需要被重置为第一页
       this.tableSpec.pagination.current = 1;
       this.queryParams.page = this.tableSpec.pagination.current;
     },
-    handleReset(clearFilters, dataIndex) {
+    handleReset: function (clearFilters, dataIndex) {
       clearFilters();
       this.handleSearch('', dataIndex);
     },
@@ -362,7 +374,7 @@ export default {
       this.modelSpec.visible = true;
       this.recordEditForm = targetRecord;
     },
-    handleOk(e) {
+    handleOk: async function (e) {
       if (
           !standardiseTrialCompoundName(this.recordEditForm.trialCompoundName).status ||
           !standardiseTrialCountryCode(this.recordEditForm.trialCountryCode).status
@@ -372,29 +384,30 @@ export default {
         return;
       }
       this.modelSpec.confirmLoading = true;
-      this.$axios.patch(
-          '/trial/update',
-          {
-            updatedTrial: this.recordEditForm,
-          },
-      ).then((response) => {
-        this.$notification['success']({
-          message: 'Action Succeed',
-          description: 'The record has been updated successfully. The page will be refreshed in 5 seconds.',
+      try {
+        const response = await this.$axios.patch('/trial/update', {
+          updatedTrial: this.recordEditForm,
         });
-        setTimeout(() => {
-          location.reload();
-        }, 5000)
-      }).catch((error) => {
+        // 更新试验资料成功
+        if (['1'].includes(response.data.statusCode)) {
+          this.$notification['success']({
+            message: 'Action Succeed',
+            description: 'The record has been updated successfully. The page will be refreshed in 5 seconds.',
+          });
+          setTimeout(() => {
+            location.reload();
+          }, 5000);
+        }
+      } catch (error) {
         console.error(error);
         this.$notification['error']({
           message: 'Action Failed',
           description: `Sorry, your request failed. Detailed error description is listed as follows:${ error }`,
         });
-      }).finally(() => {
+      } finally {
         this.modelSpec.visible = false;
         this.modelSpec.confirmLoading = false;
-      });
+      }
     },
     formatTrialCode: formatTrialCode,
     formatTrialPhase: formatTrialPhase,

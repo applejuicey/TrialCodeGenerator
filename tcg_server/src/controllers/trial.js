@@ -14,7 +14,7 @@ const trialGenerateController = async (ctx, next) => {
       statusCode: "0",
       error: {
         message: `unknown error when create one trial: ${error}`,
-        errorCode: '0_CREATE_TRIAL',
+        errorCode: '0_TRIAL_CREATE',
       },
     };
   } finally {
@@ -22,7 +22,7 @@ const trialGenerateController = async (ctx, next) => {
   }
 };
 
-const trialBatchQueryController = async (ctx, next) => {
+const trialQueryController = async (ctx, next) => {
   let result;
   try {
     const queryResults = await getSpecificTrials(ctx.request.body.batchQueryParams);
@@ -35,8 +35,8 @@ const trialBatchQueryController = async (ctx, next) => {
     result = {
       statusCode: "0",
       error: {
-        message: `unknown error when doing batch queries: ${error}`,
-        errorCode: '0_BATCH_QUERY',
+        message: `unknown error when doing trial query: ${error}`,
+        errorCode: '0_TRIAL_QUERY',
       },
     };
   } finally {
@@ -58,7 +58,7 @@ const trialUpdateController = async (ctx, next) => {
       statusCode: "0",
       error: {
         message: `unknown error when update one trial: ${error}`,
-        errorCode: '0_UPDATE_TRIAL',
+        errorCode: '0_TRIAL_UPDATE',
       },
     };
   } finally {
@@ -80,7 +80,7 @@ const trialDeleteController =  async (ctx, next) => {
       statusCode: "0",
       error: {
         message: `unknown error when delete one trial: ${error}`,
-        errorCode: '0_DELETE_TRIAL',
+        errorCode: '0_TRIAL_DELETE',
       },
     };
   } finally {
@@ -88,7 +88,7 @@ const trialDeleteController =  async (ctx, next) => {
   }
 };
 
-const trialSummaryController = async (ctx, next) => {
+const trialSummariseController = async (ctx, next) => {
   let result;
   try {
     const queryResults = await getSummary(ctx.request.body.summaryParams);
@@ -101,8 +101,8 @@ const trialSummaryController = async (ctx, next) => {
     result = {
       statusCode: "0",
       error: {
-        message: `unknown error when doing batch queries: ${error}`,
-        errorCode: '0_SUMMARY_QUERY',
+        message: `unknown error when doing summary: ${error}`,
+        errorCode: '0_TRIAL_SUMMARIZE',
       },
     };
   } finally {
@@ -110,4 +110,4 @@ const trialSummaryController = async (ctx, next) => {
   }
 };
 
-module.exports = { trialGenerateController, trialBatchQueryController, trialUpdateController, trialDeleteController, trialSummaryController };
+module.exports = { trialGenerateController, trialQueryController, trialUpdateController, trialDeleteController, trialSummariseController };

@@ -151,29 +151,30 @@ export default {
     };
   },
   methods: {
-    submitQuery: function () {
+    submitQuery: async function () {
       this.tableSpec.loading = true;
       this.queryForm.waiting = true;
       let compoundNames = this.queryForm.queryExpression.split(',');
       compoundNames = compoundNames.map((name) => {
         return name.trim();
-      })
-      this.$axios.post(
-          '/trial/summary',
-          {
-            summaryParams: {
-              compoundNames: compoundNames,
-            },
+      });
+      try {
+        const response = await this.$axios.post('/trial/summarise', {
+          summaryParams: {
+            compoundNames: compoundNames,
           },
-      ).then((response) => {
-        this.tableSpec.data = this.parseSummaryResults(response.data.queryResults);
-      }).catch((error) => {
+        });
+        // 获取试验汇总成功
+        if (['1'].includes(response.data.statusCode)) {
+          this.tableSpec.data = this.parseSummaryResults(response.data.queryResults);
+        }
+      } catch (error) {
         console.error(error);
-      }).finally(() => {
+      } finally {
         this.queryForm.waiting = false;
         this.tableSpec.loading = false;
         this.queryForm.submitted = true;
-      });
+      }
     },
     parseSummaryResults: function (rawSummaryResults) {
       let uniqueCompoundNames = [];

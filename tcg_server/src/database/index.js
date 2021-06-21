@@ -1,12 +1,12 @@
 const { Sequelize } = require('sequelize');
+const { dbConfig } = require('./config.js');
 
 const databaseConfig = {
-  databaseName: 'TCG',
-  username: 'yangfan',
-  password: 'Fyhaoshuai23333',
-  // host: 'localhost',
-  host: '172.16.10.23',
-  port: '3306'
+  databaseName: dbConfig.databaseName,
+  username: dbConfig.username,
+  password: dbConfig.password,
+  host: dbConfig.host,
+  port: dbConfig.port
 };
 
 const sequelize = new Sequelize(databaseConfig.databaseName, databaseConfig.username, databaseConfig.password, {

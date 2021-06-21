@@ -6,19 +6,35 @@
         <a class="logo" href="https://www.hrs.com.cn/index.html"/>
         <a-menu theme="dark" mode="horizontal" v-model:selectedKeys="menuSelectedKeys" class="menu">
           <a-menu-item key="1" @click="pushRoute('trial-list')">
-            <ToolOutlined/>Control Panel
+            <OrderedListOutlined />Trials
           </a-menu-item>
           <a-menu-item key="2" @click="pushRoute('code-gen')" v-if="!['t3'].includes(userInfo.userType)">
-            <SettingOutlined/>Protocol Code Generator
+            <PlusCircleOutlined />CREATE!
           </a-menu-item>
           <a-menu-item key="3" @click="pushRoute('trial-summary')">
-            <TableOutlined/>Summary Table
+            <TableOutlined/>Summary
           </a-menu-item>
           <a-menu-item key="4" @click="pushRoute('about')">
             <InfoCircleOutlined/>About
           </a-menu-item>
-          <a-menu-item key="5" @click="logout">
-            <LogoutOutlined/>Logout ({{ userInfo.username }})
+          <a-menu-item key="5" @click="aboutMe">
+            <UserOutlined />Me
+            <a-modal centered :title="modelSpec.title" v-model:visible="modelSpec.visible" :confirm-loading="modelSpec.confirmLoading" @ok="handleOk">
+              <a-form layout="vertical" :model="userInfoEditForm">
+                <a-form-item label="Username" >
+                  <a-input v-model:value="userInfoEditForm.username" type="text" placeholder="Please fill in your username" :disabled="true"/>
+                </a-form-item>
+                <a-form-item label="Old Password" >
+                  <a-input v-model:value="userInfoEditForm.oldPassword" type="text" placeholder="Please fill in your old password"/>
+                </a-form-item>
+                <a-form-item label="New Password" >
+                  <a-input v-model:value="userInfoEditForm.newPassword" type="text" placeholder="Please fill in your new password"/>
+                </a-form-item>
+              </a-form>
+            </a-modal>
+          </a-menu-item>
+          <a-menu-item key="6" @click="logout">
+            <LogoutOutlined/>Logout
           </a-menu-item>
         </a-menu>
       </a-layout-header>
@@ -28,7 +44,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.0.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.1.0
       </a-layout-footer>
     </a-layout>
 
@@ -43,39 +59,57 @@ import moment from 'moment';
 import 'moment/locale/zh-cn';
 import 'moment/locale/en-gb';
 import {
-  ToolOutlined,
-  SettingOutlined,
+  OrderedListOutlined,
+  PlusCircleOutlined,
   TableOutlined,
   InfoCircleOutlined,
   LogoutOutlined,
+  UserOutlined,
 } from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
 import { Modal } from 'ant-design-vue';
 moment.locale('en-gb');
 export default {
   components: {
-    ToolOutlined,
-    SettingOutlined,
+    OrderedListOutlined,
+    PlusCircleOutlined,
     TableOutlined,
     InfoCircleOutlined,
     LogoutOutlined,
+    UserOutlined,
   },
   data () {
     return {
       locale: enGB,
       allBackgroundImages: allBackgroundImages,
-
+      modelSpec: {
+        title: 'Edit personal info',
+        visible: false,
+        confirmLoading: false,
+      },
+      userInfoEditForm: {
+        username: '',
+        oldPassword: '',
+        newPassword: '',
+      },
+      menuSelectedKeys: [],
+      routerNameToMenuKeys: {
+        'trial-list': ['1'],
+        'code-gen': ['2'],
+        'trial-summary': ['3'],
+        'about': ['4'],
+      },
     };
   },
+  mounted() {
+    this.menuSelectedKeys = this.routerNameToMenuKeys[this.$route.name];
+  },
+  watch: {
+    '$route.name': function (newVal, oldVal) {
+      this.menuSelectedKeys = this.routerNameToMenuKeys[newVal];
+    }
+  },
   computed: {
-    menuSelectedKeys: function () {
-      const menuKeysRouterNameMap = new Map();
-      menuKeysRouterNameMap.set( 'trial-list', ['1'])
-          .set('code-gen', ['2'])
-          .set('trial-summary', ['3'])
-          .set('about', ['4']);
-      return menuKeysRouterNameMap.get(this.$route.name);
-    },
     onLoginPage: function () {
       return ['login', undefined].includes(this.$route.name);
     },
@@ -87,7 +121,7 @@ export default {
     },
     userInfo: function () {
       return JSON.parse(localStorage.getItem('userInfo'));
-    }
+    },
   },
   methods: {
     pushRoute: function (routeName) {
@@ -111,13 +145,60 @@ export default {
         },
       });
     },
+    aboutMe: function () {
+      this.userInfoEditForm.username = this.userInfo.username;
+      this.modelSpec.visible = true;
+    },
+    handleOk: async function () {
+      this.modelSpec.confirmLoading = true;
+      try {
+        const response = await this.$axios.patch('/user/update', {
+          userInfo: {
+            username: this.userInfoEditForm.username,
+            oldPassword: this.userInfoEditForm.oldPassword,
+            newPassword: this.userInfoEditForm.newPassword,
+          },
+        });
+        // 更新用户资料成功
+        if (['1'].includes(response.data.statusCode)) {
+          this.$notification['success']({
+            message: 'Action Succeed',
+            description: 'User information has been updated successfully. The page will be refreshed in 5 seconds.',
+          });
+          setTimeout(() => {
+            location.reload();
+          }, 5000);
+        }
+        // 更新用户资料失败
+        if (['0'].includes(response.data.statusCode)) {
+          this.$notification['error']({
+            message: 'Action Failed',
+            description: `Sorry, your request failed. Detailed error description is listed as follows:${ response.data.error.message }`,
+          });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.modelSpec.visible = false;
+        this.modelSpec.confirmLoading = false;
+      }
+    },
   },
 };
 </script>
 
 <style>
+@font-face {
+  font-family: 'Lora';
+  src: url('../public/fonts/Lora-Regular.ttf');
+}
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: url('../public/fonts/NotoSerifSC-Light.otf');
+}
 #app {
   overflow-x: hidden;
+  font-family: 'Lora', 'Noto Serif SC', serif;
 }
 #app-container {
   min-height: 100vh;

@@ -40,25 +40,24 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
 
-  // get token from localstorage and do verification
+  // get token from localstorage and verify
   let localTokenIsValid = false;
   let decodedUserInfo;
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  await axios.post(
-    '/verify-token',
-    {
+  try {
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+    const response = await axios.post('/auth/verify', {
       userInfo: userInfo,
-    },
-  ).then((response) => {
+    });
+    // 登录状态有效
     if (['1'].includes(response.data.statusCode)) {
       if (response.data.decodedResult.valid) {
         localTokenIsValid = true;
         decodedUserInfo = response.data.decodedResult.decoded;
       }
     }
-  }).catch((error) => {
-    console.log(error);
-  });
+  } catch (error) {
+    console.error(error);
+  }
 
   // to login page && already logged in
   if (['login'].includes(to.name)  && localTokenIsValid) {
@@ -75,8 +74,8 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login' });
   }
 
-  // to generate page && user with userType of readonly
-  else if (['generator'].includes(to.name) && ['t3'].includes(decodedUserInfo.userType)) {
+  // to generate page && already logged in && user with userType of readonly
+  else if (['generator'].includes(to.name) && localTokenIsValid && ['t3'].includes(decodedUserInfo.userType)) {
     next({ name: 'trial-list' });
   }
 

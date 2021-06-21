@@ -17,4 +17,22 @@ const getOneUser = async function(userInfo) {
   }
 };
 
-module.exports = { getOneUser };
+// update one user
+const updateOneUser = async function(userInfo) {
+  try {
+    console.log(userInfo)
+    return await sequelize.transaction(async (transaction) => {
+      const targetRecord = await User.findOne({
+        where: {
+          username: userInfo.username,
+        }
+      });
+      targetRecord.password = userInfo.newPassword;
+      return await targetRecord.save();
+    });
+  } catch (error) {
+    console.error(error)
+  }
+};
+
+module.exports = { getOneUser, updateOneUser };
