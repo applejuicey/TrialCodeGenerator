@@ -22,6 +22,12 @@
         <div class="para-body">
           <ul>
             <li>
+              <span class="version-number">V 5.2.0</span>
+              <ul>
+                <li>ADD: Trial status change log now added.</li>
+              </ul>
+            </li>
+            <li>
               <span class="version-number">V 5.1.0</span>
               <ul>
                 <li>REV: APIs of both ends are changed.</li>

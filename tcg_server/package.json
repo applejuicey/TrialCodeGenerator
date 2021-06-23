@@ -1,6 +1,6 @@
 {
   "name": "tcg_server",
-  "version": "1.0.0",
+  "version": "5.2.0",
   "description": "provide service for the trial code generator",
   "main": "/src/index.js",
   "scripts": {

@@ -68,7 +68,7 @@ Trial.init({
     },
   },
   trialStatusDescription: {
-    type: Sequelize.STRING(255),
+    type: Sequelize.STRING(500),
     allowNull: true,
   },
   trialPreviousProtocolCode: {
@@ -76,6 +76,10 @@ Trial.init({
     allowNull: true,
   },
   trialName: {
+    type: Sequelize.STRING(500),
+    allowNull: true,
+  },
+  trialStatusLog: {
     type: Sequelize.STRING(500),
     allowNull: true,
   },

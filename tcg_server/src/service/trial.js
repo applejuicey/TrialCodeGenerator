@@ -3,15 +3,15 @@ const sequelize = require('../database/index');
 const { Op } = require("sequelize");
 
 // create one trial
-const createOneTrial = async function(newTrial) {
+const createOneTrial = async function(body) {
   try {
     return await sequelize.transaction(async (transaction) => {
       const parsedNewTrial = {
-        trialCompoundName: newTrial.trialCompoundName,
-        trialPhase: newTrial.trialPhase,
-        trialGenerationDate: newTrial.trialGenerationDate,
-        trialCountryCode: newTrial.trialCountryCode,
-        trialName: newTrial.trialName,
+        trialCompoundName: body.newTrial.trialCompoundName,
+        trialPhase: body.newTrial.trialPhase,
+        trialGenerationDate: body.newTrial.trialGenerationDate,
+        trialCountryCode: body.newTrial.trialCountryCode,
+        trialName: body.newTrial.trialName,
       };
       // 获取当前化合物及期型下最大编号
       let currentMaxUniqueSequenceCode = await Trial.max(
@@ -37,6 +37,8 @@ const createOneTrial = async function(newTrial) {
         newSeqStr = newSeq.toString();
       }
       parsedNewTrial.trialUniqueSequenceCode = newSeq;
+      // 创建者及时间戳
+      parsedNewTrial.trialStatusLog = `Proposed by ${ body.userInfo.username } on ${ new Date().toLocaleDateString() }. </br>`;
       return await Trial.create(
         parsedNewTrial,
       );
@@ -77,20 +79,25 @@ const getSpecificTrials = async function(batchQueryParams) {
 };
 
 // update one trial
-const updateOneTrial = async function(updatedTrial) {
+const updateOneTrial = async function(body) {
   try {
     return await sequelize.transaction(async (transaction) => {
       const targetRecord = await Trial.findOne({
         where: {
-          trialUUID: updatedTrial.trialUUID,
+          trialUUID: body.updatedTrial.trialUUID,
         }
       });
-      targetRecord.trialCompoundName = updatedTrial.trialCompoundName;
-      targetRecord.trialPhase = updatedTrial.trialPhase;
-      targetRecord.trialCountryCode = updatedTrial.trialCountryCode;
-      targetRecord.trialStatus = updatedTrial.trialStatus;
-      targetRecord.trialName = updatedTrial.trialName;
-      targetRecord.trialStatusDescription = updatedTrial.trialStatusDescription;
+      // targetRecord.trialCompoundName = body.updatedTrial.trialCompoundName;
+      // targetRecord.trialPhase = body.updatedTrial.trialPhase;
+      targetRecord.trialCountryCode = body.updatedTrial.trialCountryCode;
+      targetRecord.trialName = body.updatedTrial.trialName;
+      targetRecord.trialStatusDescription = body.updatedTrial.trialStatusDescription;
+      // 若变更了trialStatus则在trialStatusLog中记录
+      const oldTrialStatus = targetRecord.trialStatus;
+      if (oldTrialStatus !== body.updatedTrial.trialStatus) {
+        targetRecord.trialStatusLog = targetRecord.trialStatusLog + `Status changed by ${ body.userInfo.username } on ${ new Date().toLocaleDateString() }. </br>`;
+      }
+      targetRecord.trialStatus = body.updatedTrial.trialStatus;
       return await targetRecord.save();
     });
   } catch (error) {

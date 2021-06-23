@@ -49,6 +49,9 @@
               {{ formatTrialStatus(text).text }}
             </span>
           </template>
+          <template v-slot:trialStatusLog="{ text }">
+            <span v-html="text"></span>
+          </template>
           <template v-slot:trialGenerationDate="{ text }">
             <span>{{ formatTrialGenerationDate(text) }}</span>
           </template>
@@ -246,6 +249,12 @@ export default {
             width: '200px',
           },
           {
+            title: 'Status Log',
+            dataIndex: 'trialStatusLog',
+            slots: { customRender: 'trialStatusLog' },
+            width: '400px',
+          },
+          {
             title: 'Status Description',
             dataIndex: 'trialStatusDescription',
             width: '200px',
@@ -387,6 +396,7 @@ export default {
       try {
         const response = await this.$axios.patch('/trial/update', {
           updatedTrial: this.recordEditForm,
+          userInfo: JSON.parse(localStorage.getItem('userInfo')),
         });
         // 更新试验资料成功
         if (['1'].includes(response.data.statusCode)) {

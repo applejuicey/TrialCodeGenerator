@@ -44,7 +44,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.1.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.2.0
       </a-layout-footer>
     </a-layout>
 

@@ -227,6 +227,7 @@ export default {
       try {
         const response = await this.$axios.post('/trial/generate', {
           newTrial: this.codeGeneratorForm,
+          userInfo: JSON.parse(localStorage.getItem('userInfo')),
         });
         // 创建试验成功
         if (['1'].includes(response.data.statusCode)) {

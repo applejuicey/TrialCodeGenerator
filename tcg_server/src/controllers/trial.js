@@ -3,7 +3,7 @@ const { createOneTrial, getSpecificTrials, updateOneTrial, deleteOneTrial, getSu
 const trialGenerateController = async (ctx, next) => {
   let result;
   try {
-    const createdTrial = await createOneTrial(ctx.request.body.newTrial);
+    const createdTrial = await createOneTrial(ctx.request.body);
     result = {
       statusCode: "1",
       createdTrial: createdTrial,
@@ -47,7 +47,7 @@ const trialQueryController = async (ctx, next) => {
 const trialUpdateController = async (ctx, next) => {
   let result;
   try {
-    const updatedTrial = await updateOneTrial(ctx.request.body.updatedTrial);
+    const updatedTrial = await updateOneTrial(ctx.request.body);
     result = {
       statusCode: "1",
       updatedTrial: updatedTrial,
