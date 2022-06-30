@@ -2,6 +2,24 @@ import { message } from 'ant-design-vue';
 import country from "country-list-js";
 import { compounds } from './compounds.js';
 
+const formatColumnName = function (value) {
+  const columnNameMap = new Map();
+  columnNameMap.set('trialStatus', 'Status')
+    .set('trialGenerationDate', 'Time Stamp')
+    .set('trialCompoundName', 'Compound Name')
+    .set('trialPhase', 'Phase')
+    .set('trialCounterNumber', 'NO.')
+    .set('trialCountryCode', 'Country');
+  return columnNameMap.get(value);
+};
+
+const formatSortOrderName = function (value) {
+  const sortOrderNameMap = new Map();
+  sortOrderNameMap.set('ASC', 'Ascending')
+    .set('DESC', 'Descending');
+  return sortOrderNameMap.get(value);
+};
+
 const formatTrialPhase = function (value) {
   const phaseMap = new Map();
   phaseMap.set('p0', '0')
@@ -92,8 +110,9 @@ const standardiseTrialCountryCode = function (countryCode) {
 }
 
 export {
+  formatColumnName,
+  formatSortOrderName,
   formatTrialPhase,
-  formatTrialCode,
   standardiseTrialCompoundName,
   standardiseTrialCountryCode,
 };

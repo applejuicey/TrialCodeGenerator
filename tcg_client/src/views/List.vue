@@ -7,6 +7,13 @@
           <OrderedListOutlined />&nbsp;
           <span>List of Trials</span>
         </div>
+        <ul>
+          Current sorting algorithm applied in the table:
+          <template v-for="(value, key) in queryParams.sorters">
+            <li v-if="value">{{ formatColumnName(key) }}: {{ formatSortOrderName(value) }}</li>
+          </template>
+          Please click on the column header to toggle the sorting order.
+        </ul>
         <a-table
             :scroll="{ x: 'max-content', y: 'max-content' }"
             :columns="tableSpec.columns"
@@ -17,8 +24,8 @@
             @change="handleTableChange"
             bordered
         >
-          <template v-slot:trialCode="{ text, record }">
-            <span>{{ formatTrialCode(record) }}</span>
+          <template v-slot:trialProtocolCode="{ text, record }">
+            <span>{{record.trialProtocolCode}}</span>
           </template>
           <template v-slot:filterDropdown="{ setSelectedKeys, selectedKeys, clearFilters, column }">
             <div style="padding: 8px">
@@ -173,7 +180,8 @@
 
 <script>
 import {
-  formatTrialCode,
+  formatColumnName,
+  formatSortOrderName,
   formatTrialPhase,
   standardiseTrialCompoundName,
   standardiseTrialCountryCode,
@@ -202,31 +210,21 @@ export default {
     return {
       userInfo: JSON.parse(localStorage.getItem('userInfo')),
       queryParams: {
-        results: 10,
-        page: 1,
+        pagination: {
+          offset: 0,
+          limit: 10,
+        },
         filters: {},
+        sorters: {
+          trialStatus: 'ASC',
+          trialGenerationDate: 'DESC',
+          trialCompoundName: 'ASC',
+          trialPhase: 'ASC',
+          trialCounterNumber: 'ASC',
+        },
       },
       tableSpec: {
         columns: [
-          {
-            title: 'Compound Name',
-            dataIndex: 'trialCompoundName',
-            sorter: (a, b) => {
-              return a.trialCompoundName.localeCompare(b.trialCompoundName)
-            },
-            sortDirections: ['descend', 'ascend'],
-            slots: {
-              filterDropdown: 'filterDropdown',
-              filterIcon: 'filterIcon',
-            },
-            width: '200px',
-          },
-          {
-            title: 'Protocol Code',
-            dataIndex: 'trialCode',
-            slots: { customRender: 'trialCode' },
-            width: '200px',
-          },
           {
             title: 'Status',
             dataIndex: 'trialStatus',
@@ -239,14 +237,49 @@ export default {
             width: '120px',
           },
           {
+            title: 'Time Stamp',
+            dataIndex: 'trialGenerationDate',
+            sorter: (a, b) => {},
+            sortDirections: ['ASC', 'DESC'],
+            slots: { customRender: 'trialGenerationDate' },
+            width: '150px',
+          },
+          {
+            title: 'Compound Name',
+            dataIndex: 'trialCompoundName',
+            sorter: (a, b) => {},
+            sortDirections: ['ASC', 'DESC'],
+            slots: {
+              filterDropdown: 'filterDropdown',
+              filterIcon: 'filterIcon',
+            },
+            width: '200px',
+          },
+          {
+            title: 'Phase',
+            dataIndex: 'trialPhase',
+            sorter: (a, b) => {},
+            sortDirections: ['ASC', 'DESC'],
+            slots: { customRender: 'trialPhase' },
+            width: '100px',
+          },
+          {
+            title: 'NO.',
+            dataIndex: 'trialCounterNumber',
+            sorter: (a, b) => {},
+            sortDirections: ['ASC', 'DESC'],
+            width: '80px',
+          },
+          {
+            title: 'Protocol Code',
+            dataIndex: 'trialProtocolCode',
+            slots: { customRender: 'trialProtocolCode' },
+            width: '200px',
+          },
+          {
             title: 'Protocol Name',
             dataIndex: 'trialName',
             width: '400px',
-          },
-          {
-            title: 'Previous Protocol Code',
-            dataIndex: 'trialPreviousProtocolCode',
-            width: '200px',
           },
           {
             title: 'Status Log',
@@ -262,42 +295,9 @@ export default {
           {
             title: 'Country',
             dataIndex: 'trialCountryCode',
-            sorter: (a, b) => {
-              a.trialCountryCode = a.trialCountryCode? a.trialCountryCode : '';
-              b.trialCountryCode = b.trialCountryCode? b.trialCountryCode : '';
-              return a.trialCountryCode.localeCompare(b.trialCountryCode);
-            },
-            sortDirections: ['descend', 'ascend'],
+            sorter: (a, b) => {},
+            sortDirections: ['ASC', 'DESC'],
             width: '120px',
-          },
-          {
-            title: 'Time Stamp',
-            dataIndex: 'trialGenerationDate',
-            sorter: (a, b) => {
-              return a.trialGenerationDate.localeCompare(b.trialGenerationDate);
-            },
-            sortDirections: ['descend', 'ascend'],
-            slots: { customRender: 'trialGenerationDate' },
-            width: '150px',
-          },
-          {
-            title: 'Phase',
-            dataIndex: 'trialPhase',
-            sorter: (a, b) => {
-              return a.trialPhase.localeCompare(b.trialPhase);
-            },
-            sortDirections: ['descend', 'ascend'],
-            slots: { customRender: 'trialPhase' },
-            width: '100px',
-          },
-          {
-            title: 'NO.',
-            dataIndex: 'trialUniqueSequenceCode',
-            sorter: (a, b) => {
-              return a.trialUniqueSequenceCode.toString().localeCompare(b.trialUniqueSequenceCode.toString());
-            },
-            sortDirections: ['descend', 'ascend'],
-            width: '80px',
           },
           {
             title: 'Action',
@@ -325,6 +325,7 @@ export default {
     this.fetch();
   },
   watch: {
+    // 任何行为触发queryParams变更时重新获取数据
     queryParams: {
       handler(newVal, oldVal) {
         this.fetch(newVal);
@@ -342,6 +343,7 @@ export default {
     },
     fetch: async function () {
       this.tableSpec.loading = true;
+      console.log('qq',this.queryParams)
       try {
         const response = await this.$axios.post('/trial/query', {
           batchQueryParams: this.queryParams,
@@ -353,6 +355,7 @@ export default {
           this.tableSpec.data = response.data.queryResults.hitTargets;
           this.tableSpec.pagination = pagination;
         }
+        console.log('res',response.data.queryResults.hitTargets)
       } catch (error) {
         console.error(error);
       } finally {
@@ -360,26 +363,50 @@ export default {
       }
     },
     handleTableChange: function (pagination, filters, sorter) {
+      // 服务端每次都按照filters和sorter获取所有结果，然后根据pagination截取结果并返回客户端
+      console.log('11111', pagination,filters,sorter)
       const pager = { ...this.tableSpec.pagination };
       pager.current = pagination.current;
       this.tableSpec.pagination = pager;
-      // 根据当前表格信息更新post参数
-      this.queryParams.results = pagination.pageSize? pagination.pageSize : this.queryParams.results;
-      this.queryParams.page = pagination.current? pagination.current : this.queryParams.page;
-      this.queryParams.filters = { ...this.queryParams.filters, ...filters };
+      // pagination：每次有更新，就改变this.queryParams.pagination对象的对应字段
+      // skip 'offset' instances and fetch the 'limit' after that
+      this.queryParams.pagination = {
+        offset: (pagination.current - 1) * pagination.pageSize,
+        limit: pagination.pageSize,
+      };
+      console.log('222', this.queryParams.pagination)
+      // filters：每次有更新，就向this.queryParams.sorters对象中增加一个KV['字段名']: '取值'
+      this.queryParams.filters = {
+        ...this.queryParams.filters,
+        ...filters,
+      };
+      console.log('33', this.queryParams.filters)
+      // sorter：每次有更新，就向this.queryParams.sorters对象中增加一个KV['字段名']: '方向'
+      console.log('dsfsd',sorter)
+      if (sorter.field) {
+        this.queryParams.sorters = {
+          ...this.queryParams.sorters,
+          [sorter.field]: sorter.order,
+        };
+      }
+      console.log('44', this.queryParams.sorters)
+      console.log('queryParams',this.queryParams);
     },
     handleSearch: function (selectedKeys, dataIndex) {
       this.queryParams.filters[dataIndex] = selectedKeys[0];
       // 每次改变化合物名称时，分页需要被重置为第一页
       this.tableSpec.pagination.current = 1;
-      this.queryParams.page = this.tableSpec.pagination.current;
+      this.queryParams.pagination = {
+        offset: 0,
+        limit: 10,
+      };
     },
     handleReset: function (clearFilters, dataIndex) {
       clearFilters();
       this.handleSearch('', dataIndex);
     },
     editRecord: function (text, targetRecord) {
-      this.modelSpec.title = `Edit record "${ formatTrialCode(targetRecord) }"`;
+      this.modelSpec.title = `Edit record "${ targetRecord.trialProtocolCode }"`;
       this.modelSpec.visible = true;
       this.recordEditForm = targetRecord;
     },
@@ -419,7 +446,8 @@ export default {
         this.modelSpec.confirmLoading = false;
       }
     },
-    formatTrialCode: formatTrialCode,
+    formatColumnName: formatColumnName,
+    formatSortOrderName: formatSortOrderName,
     formatTrialPhase: formatTrialPhase,
     formatTrialStatus: function (value) {
       const statusMap = new Map();

@@ -1,9 +1,6 @@
 .DS_Store
 node_modules
 /dist
-/tcg_server/src/models/data.xls
-/tcg_server/src/models/users.json
-/tcg_server/src/models/compounds.json
 
 # local env files
 .env.local

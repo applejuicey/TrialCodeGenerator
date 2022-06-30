@@ -58,6 +58,12 @@
           <a-form-item label="Protocol Name">
             <a-textarea v-model:value="codeGeneratorForm.trialName" placeholder="Please input the protocol name"/>
           </a-form-item>
+          <a-form-item label="Protocol Code">
+            <a-input v-model:value="codeGeneratorForm.trialProtocolCode" type="text" placeholder="Please input the protocol code if there is one"/>
+          </a-form-item>
+          <a-form-item label="Protocol Code Identifier" v-show="codeGeneratorForm.trialProtocolCode">
+            <a-input v-model:value="codeGeneratorForm.trialUniqueSequenceCode" type="text" placeholder="Complete this field if there is an identifier in the protocol code"/>
+          </a-form-item>
           <a-form-item label="Trial Phase">
             <a-select v-model:value="codeGeneratorForm.trialPhase" placeholder="Please select a trial phase">
               <a-select-option value="p0">
@@ -143,7 +149,6 @@
 <script>
 import moment from 'moment';
 import {
-  formatTrialCode,
   standardiseTrialCompoundName,
   standardiseTrialCountryCode,
 } from '../utils/formatter.js';
@@ -184,6 +189,8 @@ export default {
         trialName: undefined,
         trialGenerationDate: moment(new Date(), 'YYYY-MM-DD'),
         trialCountryCode: undefined,
+        trialProtocolCode: undefined,
+        trialUniqueSequenceCode: undefined,
       },
       submissionResult: {
         status: '500',
@@ -234,7 +241,8 @@ export default {
           this.submissionResult.status = 'success';
           this.submissionResult.title = 'Action Succeeded';
           const createdTrial = response.data.createdTrial;
-          const trialCode = formatTrialCode(createdTrial);
+          console.log('aaa',createdTrial);
+          const trialCode = createdTrial.trialProtocolCode;
           this.submissionResult.subTitle = `Your submission is successful and the unique trial protocol code is ${ trialCode }.`;
         }
       } catch (error) {

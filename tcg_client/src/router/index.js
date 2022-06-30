@@ -22,6 +22,11 @@ const routes = [
     component: () => import('../views/Summary.vue'),
   },
   {
+    path: '/plot',
+    name: 'trial-plot',
+    component: () => import('../views/Plot.vue'),
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('../views/About.vue'),

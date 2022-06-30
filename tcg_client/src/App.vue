@@ -3,8 +3,10 @@
 
     <a-layout id="app-container" :style="backgroundImageStyle">
       <a-layout-header class="header" v-if="!onLoginPage">
-        <a class="logo" href="https://www.hrs.com.cn/index.html"/>
         <a-menu theme="dark" mode="horizontal" v-model:selectedKeys="menuSelectedKeys" class="menu">
+          <a-menu-item key="0" @click="toOfficialWebsite()">
+            <span class="logo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          </a-menu-item>
           <a-menu-item key="1" @click="pushRoute('trial-list')">
             <OrderedListOutlined />Trials
           </a-menu-item>
@@ -13,6 +15,9 @@
           </a-menu-item>
           <a-menu-item key="3" @click="pushRoute('trial-summary')">
             <TableOutlined/>Summary
+          </a-menu-item>
+          <a-menu-item key="7" @click="pushRoute('trial-plot')">
+            <LineChartOutlined />Plot
           </a-menu-item>
           <a-menu-item key="4" @click="pushRoute('about')">
             <InfoCircleOutlined/>About
@@ -44,7 +49,7 @@
         </div>
       </a-layout-content>
       <a-layout-footer class="footer" v-if="!onLoginPage">
-        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 5.2.0
+        HENGRUI PHARMA. ©2020 -- Clinical Trial Protocol Code Registration Platform Version 6.0.0
       </a-layout-footer>
     </a-layout>
 
@@ -65,6 +70,7 @@ import {
   InfoCircleOutlined,
   LogoutOutlined,
   UserOutlined,
+  LineChartOutlined,
 } from '@ant-design/icons-vue';
 import { createVNode } from 'vue';
 import { Modal } from 'ant-design-vue';
@@ -77,6 +83,7 @@ export default {
     InfoCircleOutlined,
     LogoutOutlined,
     UserOutlined,
+    LineChartOutlined,
   },
   data () {
     return {
@@ -97,11 +104,12 @@ export default {
         'trial-list': ['1'],
         'code-gen': ['2'],
         'trial-summary': ['3'],
+        'trial-plot': ['7'],
         'about': ['4'],
       },
     };
   },
-  mounted() {
+  mounted () {
     this.menuSelectedKeys = this.routerNameToMenuKeys[this.$route.name];
   },
   watch: {
@@ -128,6 +136,9 @@ export default {
       this.$router.push({
         name: routeName,
       })
+    },
+    toOfficialWebsite: function () {
+      window.location.href = "https://www.hrs.com.cn/index.html";
     },
     logout: function () {
       const self = this;
@@ -207,12 +218,12 @@ export default {
   width: 100vw;
 }
 #app-container .logo {
-  width: 120px;
-  height: 50px;
+  /*width: 120px;*/
+  /*height: 50px;*/
   background: url('~@/../public/logo2.png') no-repeat;
   background-size: 100% 100%;
-  margin: 7px 28px 7px 0;
-  float: left;
+  /*margin: 7px 28px 7px 0;*/
+  /*float: left;*/
 }
 #app-container .menu {
   line-height: 64px;

@@ -39,11 +39,14 @@ Trial.init({
   },
   trialUniqueSequenceCode: {
     type: Sequelize.INTEGER(),
+  },
+  trialCounterNumber: {
+    type: Sequelize.INTEGER(),
     allowNull: false,
     defaultValue: 1,
     validate: {
       notNull: {
-        msg: 'a unique trial sequence code should be specified'
+        msg: 'a trial counter number should be specified'
       },
     },
   },
@@ -71,7 +74,7 @@ Trial.init({
     type: Sequelize.STRING(500),
     allowNull: true,
   },
-  trialPreviousProtocolCode: {
+  trialProtocolCode: {
     type: Sequelize.STRING(100),
     allowNull: true,
   },

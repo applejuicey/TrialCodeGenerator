@@ -1,3 +1,6 @@
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
 const Koa = require('koa');
 const router = require('./router/index');
 const bodyParser = require('koa-bodyparser');
@@ -11,6 +14,12 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
+// http.createServer(app.callback()).listen(3000);
+const options = {
+  key: fs.readFileSync(__dirname + '/hr.key', 'utf8'),
+  cert: fs.readFileSync(__dirname + '/hr.pem', 'utf8')
+};
+https.createServer(options, app.callback()).listen(3003);
 
 // app.use(async ctx => {
 //   // the parsed body will store in ctx.request.body
@@ -22,8 +31,8 @@ app
 //   ctx.body = 'initiated';
 // });
 
-app.listen(3000);
-console.log('server running on port 3000 ......')
+// app.listen(3000);
+console.log('server running on port 3000/3002 ......')
 
 
 

@@ -1,6 +1,6 @@
 .DS_Store
 node_modules
-/src/models/data.xls
+/src/models/trials.xlsx
 /src/models/users.json
 /src/models/compounds.json
 /src/database/config.js

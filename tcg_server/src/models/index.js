@@ -2,6 +2,7 @@ const sequelize = require('../database/index');
 const xlsx = require('node-xlsx');
 const { compounds } = require('./compounds.json');
 const { users } = require('./users.json');
+const { readXlsxAndCount } = require('../utils/xlsxProcessor');
 
 // import the models
 const Trial = require('./Trial');
@@ -15,46 +16,42 @@ if (needInitialization) {
   sequelize.sync({
     force: true
   }).then(async () => {
-    console.log('tables have been created, proceeding to write initial records...');
-    // users
-    users.forEach((user) => {
-      (async function() {
+    // try to write data into database
+    try {
+      console.log('tables have been created, proceeding to write initial records...');
+      // users
+      await Promise.all(users.map(async (user) => {
         await User.create(user);
-      }());
-    });
-    // trials
-    const sheets = xlsx.parse(__dirname + '\\data.xls');
-    sheets.forEach((sheet) => {
-      for (let rowId in sheet['data']) {
-        let row = sheet['data'][rowId];
-        if (rowId !== '0' && row.length !== 0) {
-          (async function() {
-            await Trial.create({
-              trialCompoundName: row[0],
-              trialPhase: 'p' + row[1],
-              trialGenerationDate: row[2],
-              trialUniqueSequenceCode: row[5],
-              trialCountryCode: row[3],
-              trialStatus: 's1',
-              trialStatusDescription: '',
-              trialPreviousProtocolCode: row[4],
-              trialName: row[6],
-            });
-          }());
-        }
-      }
-    });
-    // compounds
-    compounds.forEach((compound) => {
-      if (compound) {
-        (async function() {
-          await Compound.create({
-            compoundName: compound,
-          });
-        }());
-      }
-    });
-    console.log('initialisation complete');
+      }));
+      // trials
+      let trials = readXlsxAndCount(__dirname + '\\trials.xlsx');
+      await Promise.all(trials.map(async (trial) => {
+        await Trial.create({
+          trialCompoundName: trial[1],
+          trialPhase: trial[2],
+          trialGenerationDate: trial[3],
+          trialUniqueSequenceCode: trial[4],
+          trialCountryCode: trial[5],
+          trialStatus: trial[6],
+          trialStatusDescription: trial[7],
+          trialProtocolCode: trial[8],
+          trialName: trial[9],
+          trialStatusLog: trial[12],
+          trialCounterNumber: trial[13],
+        });
+      }));
+      // compounds
+      await Promise.all(compounds.map(async (compoundName) => {
+        await Compound.create({
+          compoundName: compoundName,
+        });
+      }));
+      console.log('initialisation succeeded');
+    } catch (error) {
+      console.error(`initialisation error: ${ error }`);
+    } finally {
+      console.log('initialisation complete');
+    }
   }).catch((error) => {
     console.log('initialisation not complete, and the detailed error sees：', error);
   });
