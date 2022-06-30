@@ -14,12 +14,12 @@ app
   .use(router.routes())
   .use(router.allowedMethods());
 
-// http.createServer(app.callback()).listen(3000);
+http.createServer(app.callback()).listen(3000);
 const options = {
   key: fs.readFileSync(__dirname + '/hr.key', 'utf8'),
   cert: fs.readFileSync(__dirname + '/hr.pem', 'utf8')
 };
-https.createServer(options, app.callback()).listen(3003);
+https.createServer(options, app.callback()).listen(3001);
 
 // app.use(async ctx => {
 //   // the parsed body will store in ctx.request.body
@@ -32,7 +32,7 @@ https.createServer(options, app.callback()).listen(3003);
 // });
 
 // app.listen(3000);
-console.log('server running on port 3000/3002 ......')
+console.log('server running on port 3000/3001 ......')
 
 
 

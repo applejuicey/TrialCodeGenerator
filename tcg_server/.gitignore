@@ -4,6 +4,8 @@ node_modules
 /src/models/users.json
 /src/models/compounds.json
 /src/database/config.js
+/src/hr.key
+/src/hr.pem
 
 # local env files
 .env.local
